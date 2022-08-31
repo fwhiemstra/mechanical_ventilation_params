@@ -17,6 +17,7 @@ def determine_segment(parameters):
     def get_segment():
         param.append(segment_length_entry.get())
         param.append(segment_start_entry.get())
+        segment.quit()
         segment.destroy()
 
     # Create GUI
@@ -42,7 +43,7 @@ def determine_segment(parameters):
     submit_button.pack()
 
     # End tkinter module
-    #segment.mainloop()
+    segment.mainloop()
 
     return param
 

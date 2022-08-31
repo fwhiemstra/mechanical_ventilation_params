@@ -18,6 +18,16 @@ Date: October 2021
 Modified by Anne Meester
 Date: February 2022
 
+EIGEN AANPASSINGEN (updated 4-4-2022):
+- Cellen
+- Convert object naar float
+- Input file selection function
+- params/output file selection handmatig ingevoerd
+- determine_segments: line 20, 21: segment.quit(), segment.destroy()
+
+FUTURE AANPASSINGEN (updated 4-4-2022):
+- GUI lay-out
+- Keuze mixed/wave mode
 """
 
 """ Import modules and functions """
@@ -25,9 +35,11 @@ Date: February 2022
 import math
 from pathlib import PurePath
 import matplotlib.pyplot as plt
+import matplotlib
+#matplotlib.use('wxAgg')
 import os
 import sys
-my_dir = r'C:\Users\fwhiemstra\Documents\Python code\ICU_Circadian_Rhythms\scripts\mechanical_ventilation\code-anne-meester_versie-floor'
+my_dir = r'C:\Users\fwhiemstra\Documents\Python-projects\mechanical_ventilation_params\code-anne-meester_versie-floor'
 os.chdir(my_dir)
 sys.path.append(my_dir)
 
@@ -52,22 +64,26 @@ from graphs import graphs
 from summary import summary
 from select_output_file import select_output_file
 from hysteresis_area import hysteresis_area
+import pandas as pd
 
 #%%
+plt.close('all')
 """ Import and name data """
 # Start and get entries from graphical user interface
-# FH: GUI doet het niet? Hij errort op 'Output file missing'
 #[params, input_txt_file, output_xlsx_file] = graphical_user_interface()
-input_txt_file = [r'C:/Users/fwhiemstra/Documents/Python code/ICU_Circadian_Rhythms/scripts/mechanical_ventilation/test-data/MV-spontaneous-breathing-data/1__211006132800_Waves_001.txt']
-output_txt_file = [r'C:/Users/fwhiemstra/Documents/Python code/ICU_Circadian_Rhythms/scripts/mechanical_ventilation/test-data/MV-spontaneous-breathing-data/output_test.xlsx']
-params = ['123', input_txt_file[0], output_txt_file[0]]
 
-#%%
+from graphical_user_interface_input_file import graphical_user_interface_input_file
+input_txt_file = graphical_user_interface_input_file()
+#input_txt_file = [r'C:\Users\fwhiemstra\Documents\Python-projects\mechanical_ventilation_params\test-data\MV-spontaneous-breathing-data/1__211006132800_Waves_001.txt']
+#input_txt_file = [r'C:\Users\fwhiemstra\Documents\Python-projects\mechanical_ventilation_params\test-data\Additional artefact data\001\W_Hamilton-C6__220321153431_Waves_001.txt']
+
+output_xlsx_file = r'C:\Users\fwhiemstra\Documents\Python-projects\mechanical_ventilation_params\test-data\MV-spontaneous-breathing-data/output_test.xlsx'
+params = ['123', 2, 'test']
+
 # Import data from chosen input file
 input_file = input_txt_file[0]
 [p_air, p_es, flow, volume] = import_data(input_file)
 
-#%%
 """ Set variables"""
 # Calculate length of the measured signal
 length = flow.shape[0]
@@ -76,15 +92,21 @@ t_dur = math.floor(len(flow)/FS/60)
 # Patient number
 patient_id = params[0]
 
-#%%
+""" Convert objects to float64 (in case of mixed mode setting) """
+for i in range(length-1):
+    if flow[i] == '--':
+        flow[i] = 0
+    else:
+        flow[i] = float(flow[i])
+flow = pd.to_numeric(flow)
+
 """ Determine the correct start time and segment length based on the graphs of the raw data """
 # Graph of the raw data: p_es, p_air, volume and flow over time
 graphs_raw_data(p_es, p_air, volume, flow, FS, length)
+
+#%%
 # Determine correct start time and segment length
-# FH: GUI doet het wel maar krijgt params update pas door na nieuwe run, onhandig in de workflow
-#determine_segment(params)
-params.append(0.5)
-params.append(400)
+determine_segment(params)
 
 # Variable segment length
 if params[3] == '':
@@ -102,30 +124,24 @@ else:
 # 1=airway pressure OR 2=transpulmonal + airway pressure
 pressure_type = pressure_type_detection(p_es)
 
-#%%
 """ input file name """
 input_filename = PurePath(input_file).stem + PurePath(input_file).suffix
 
-#%%
 """ General code """
 # Cut recording based on specified segment length and start time
 [volume_trim, flow_trim, p_air_trim, p_es_trim, segment_time_sec, data_length] = trim_recording(
     rec_delay, FS, p_es, segment_len, volume, flow, p_air, length)
 
-#%%
 # Calculate respiratory rate - based on median frequency
 rr = respiratory_rate_fft(volume_trim)
 
-#%%
 # Detecting the start- and end points of inspiration
 [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
     volume_trim, p_es_trim, flow_trim, rr)
 
-#%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(start_insp, end_insp, volume_trim)
 
-#%%
 # Calculating PEEP
 [peep, mean_peep] = peep_calculator(start_insp, p_air_trim)
 
@@ -134,12 +150,10 @@ rr = respiratory_rate_fft(volume_trim)
 [e_breath, mean_e_breath, p_breath, air_power] = energy_calculator(
     'p_air', start_insp, end_insp, p_air_trim, volume_trim, peep)
 
-#%%
 """ Plot the three PV loops in one figure """
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex='all', sharey='all')
 fig.suptitle('Pressure volume loops')
 
-#%%
 """ Define the PV-loops and calculate the Hysteresis Area (HA) for the airway pressure """
 # Calculate Hysteresis Area (HA)
 [aw_e_breath, mean_aw_e_breath] = pv_energy_calculator(start_insp, end_insp, p_air_trim, volume_trim, 'Airway pressure', ax1)
@@ -211,6 +225,7 @@ graphs(
     end_insp_values, start_insp_values, segment_time_sec, pressure_type)
 
 # Show summary of the results
+
 summary( 
     patient_id, pressure_type, rr, mean_tidal_volume, mean_peep,
     air_power, p_tp_mean, p_es_mean, aw_loop_power, tp_loop_power, ptp_es_mean,

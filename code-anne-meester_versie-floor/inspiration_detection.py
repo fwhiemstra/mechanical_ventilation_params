@@ -30,10 +30,10 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
     a = 0
     i = 0
     while i < len(flow_trim)-dist:
-        if flow_trim[i] <= a and flow_trim[i+1] > a and flow_trim[i+dist] > 100:
+        if flow_trim[i] <= a < flow_trim[i + 1] and flow_trim[i + dist] > 100:
             start_insp_flow.append(i)
             i += 1
-        elif flow_trim[i] >= a and flow_trim[i+1] < a and flow_trim[i+dist] < -100:
+        elif flow_trim[i] >= a > flow_trim[i + 1] and flow_trim[i + dist] < -100:
             end_insp_flow.append(i)
             i += 1
         else:

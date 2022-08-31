@@ -47,7 +47,6 @@ def graphs_raw_data(p_es, p_air, volume, flow, fs_, length):
     ax4.set_ylabel(r'Flow [mL/s]')
     ax4.set_xlabel(r'Time [s]')
 
-
     plt.tight_layout()
     plt.show()
 
