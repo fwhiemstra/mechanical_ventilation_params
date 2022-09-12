@@ -1,0 +1,6 @@
+matplotlib
+tk
+pandas
+intersect
+xlsxwriter
+openpyxl
