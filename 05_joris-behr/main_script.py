@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import pandas as pd
-my_dir = r'C:\Users\fwhiemstra\Documents\Python-projects\mechanical_ventilation_params\code-Jill-Oudshoorn'
+my_dir = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\mechanical_ventilation_params\05_joris-behr'
 #my_dir = r'C:\Users\jiddl\Desktop\stage 4\python codes\code-Jill-Oudshoorn'
 os.chdir(my_dir)
 sys.path.append(my_dir)
@@ -91,8 +91,8 @@ graph = 0
 
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\fwhiemstra\Documents\mechanical_ventilation_data\data-Jill-Oudshoorn\1\1__211006132800_Waves_001.txt'
-output_xslx_file = []
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\5\5__211029094903_Waves_001.txt'
+output_xlsx_file = []
 
 if annotation == 1:
     [p_air, p_es, flow, volume, artefact_timestamp, artefact_timestamp_compressed ] = annotate_import(input_file, input_annotation, FS)
@@ -128,7 +128,7 @@ if annotation == 1 and number_coughs != 0:
     artefact_scoring(artefact_detection, artefact_timestamp, artefact_timestamp_compressed)
 
 #%%
-""" Determine the correct start time and segment length based on the graphs of the raw data """
+""" Determine the correct start time and segment length based on the graphs of the raw data without coughs"""
 # Graph of the raw data: p_es, p_air, volume and flow over time
 graphs_raw_data(p_es, p_air, volume, flow, FS)
 # Determine correct start time and segment length

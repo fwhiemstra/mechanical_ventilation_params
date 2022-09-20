@@ -5,7 +5,7 @@ Author: Anne Meester
 Date: February 2022
 
 """
-import pandas as pd
+
 import numpy as np
 from constants import FS
 
