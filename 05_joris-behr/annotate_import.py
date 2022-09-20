@@ -1,10 +1,10 @@
 import pandas as pd
 from datetime import datetime
 from datetime import timezone
-import pandas
 
 def annotate_import(input_x, input_annotation, fs_):
     """"
+    input_x = raw data.
     Returns airway pressure, esophegeal pressure, flow, volume, timestamp 
     """
     read_input_file2 = pd.read_csv(input_x, delimiter='\t')

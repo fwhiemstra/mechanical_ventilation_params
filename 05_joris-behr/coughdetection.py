@@ -28,7 +28,7 @@ def coughdetection(p_es, p_air, volume, flow):
     peakvalues_positive = p_es_signal[peakspositive]
     def running_mean(x, N, mean_total):
         x = np.pad(x, N//2, constant_values = mean_total)
-        cumsum = np.cumsum(np.insert(x, 0, 0)) 
+        cumsum = np.cumsum(np.insert(x, 0, 0))
         mean = (cumsum[N:] - cumsum[:-N]) / float(N)
         return mean
 
