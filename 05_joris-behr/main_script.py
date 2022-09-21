@@ -91,7 +91,7 @@ graph = 0
 
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\5\5__211029094903_Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\11\17_220210101541_Waves_001.txt'
 output_xlsx_file = []
 
 if annotation == 1:
@@ -133,7 +133,7 @@ if annotation == 1 and number_coughs != 0:
 graphs_raw_data(p_es, p_air, volume, flow, FS)
 # Determine correct start time and segment length
 t_dur = math.floor(len(flow)/FS/60)
-print(t_dur)
+print(f'The length of the signal is {t_dur}')
 determine_segment(params)
 
 # Variable segment length
@@ -179,7 +179,7 @@ rr = respiratory_rate_fft(volume_trim)
 #%%
 """ Calculate the energy of the airway pressures (Pair) using the energy calculator """
 [e_breath, mean_e_breath, p_breath, air_power] = energy_calculator(
-    'p_air', start_insp, end_insp, p_air_trim, volume_trim, peep)
+    'p_air', start_insp, end_insp, p_air_trim, volume_trim)
 #%%
 """ Plot the three PV loops in one figure """
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex = 'all', sharey = 'all')
@@ -201,10 +201,10 @@ if pressure_type == PRESSURE_TYPE.TRANSPULMONARY:
     """ Calculate dynamic energy using the energy calculator """
     # Calculate transpulmonary work and power
     [tp_e_breath, tp_mean_e_breath, p_tp_breath, p_tp_mean] = energy_calculator(
-    'p_tp', start_insp, end_insp, p_tp_trim, volume_trim, peep)
+    'p_tp', start_insp, end_insp, p_tp_trim, volume_trim)
     # Calculate esophageal work and power
     [es_e_breath, es_mean_e_breath, p_es_breath, p_es_mean] = energy_calculator(
-    'p_es', start_insp, end_insp, p_es_trim, volume_trim, peep)
+    'p_es', start_insp, end_insp, p_es_trim, volume_trim)
 
     """ Calculate the hysteresis using the pv energy calculator"""
     [tp_e_breath, mean_tp_e_breath] = pv_energy_calculator(

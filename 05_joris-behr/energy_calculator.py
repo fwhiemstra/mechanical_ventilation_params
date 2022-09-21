@@ -12,18 +12,19 @@ Date: February 2022
 """
 import numpy as np
 from numpy import mean
+import matplotlib.pyplot as plt
 
 from constants import CONV_FACTOR, FS
 
 
-def energy_calculator(name, start_insp, end_insp, pressure, volume_trim, peep):
+def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
     """
     Returns e_breath, mean_e_breath, p_breath, mean_p_breath
 
     """
 
     e_breath = []
-    for start, end, peep_ in zip(start_insp, end_insp, peep):
+    for start, end in zip(start_insp, end_insp):
         if end > start:
             vol_interval = volume_trim[start:end]   # Volume values of each breath
             pres_interval = pressure[start:end]     # Pressure values of each breath
@@ -57,7 +58,7 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim, peep):
             # Integrate to calculate energy per breath and convert from [mL*cmH2O] to [J]
             integration = CONV_FACTOR * np.trapz(pres_interval, vol_interval)
             e_breath.append(abs(integration))
-
+    
     # Calculate power per breath [J/min]
     p_breath = []
     energyerror = 0

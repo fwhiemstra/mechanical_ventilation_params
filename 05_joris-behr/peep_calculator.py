@@ -8,7 +8,7 @@ from numpy import mean, median
 
 def peep_calculator(start_insp, p_air_trim):
     '''
-    Calculate mean PEEP per breath as the mean pressure 50 ms before the
+    Calculate mean PEEP per breath as the mean pressure 100 ms before the
     start of inspiration. The PEEP is the mean of the mean PEEP per breath.
     '''
     peep = []
@@ -34,5 +34,4 @@ def peep_calculator(start_insp, p_air_trim):
     # Calculate mean PEEP value
     mean_peep = round(mean(peep), 2)
     print("number of errors in peep calculation is {}".format(peeperror))
-
     return peep, mean_peep

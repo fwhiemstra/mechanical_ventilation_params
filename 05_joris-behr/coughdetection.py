@@ -56,7 +56,7 @@ def coughdetection(p_es, p_air, volume, flow):
     for i in range(0, len(artefact_detection)):
         if artefact_detection[i] == 0:
             artefact_detection[i] = 'no cough'
-    print(len(artefact_detection))
+    
     """ Cough parameter calculations"""
     #time of coughing in seconds
     cough_time_total = cough_time/FSAMP
@@ -145,7 +145,7 @@ def coughdetection(p_es, p_air, volume, flow):
         length = len(p_es_clean)
         time_sec = [i / FSAMP for i in range(0, length)]
     
-        fig, axs = plt.subplots(2, sharey=True)
+        _, axs = plt.subplots(2, sharey=True)
         axs[0].plot(artefact_peaks_remove,p_es_signal[artefact_peaks_remove], "ob"); axs[0].plot(p_es_signal)
         axs[1].plot(time_sec,p_es_clean)
         plt.show()
