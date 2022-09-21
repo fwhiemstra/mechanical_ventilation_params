@@ -1,4 +1,4 @@
- """
+"""
 Pressure type detection
 - Detects pressure type from the ventilator data
 - Can be either airway pressure OR airway + transpulmonary pressure

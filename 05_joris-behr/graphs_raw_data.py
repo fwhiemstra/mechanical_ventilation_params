@@ -6,7 +6,6 @@ Date: February 2022
 
 """
 import matplotlib.pyplot as plt
-import csv
 import math
 
 def graphs_raw_data(p_es, p_air, volume, flow, fs_):

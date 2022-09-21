@@ -14,7 +14,7 @@ Modified by Anne Meester
 Date: February 2022
 """
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 
 from constants import OUTPUT_FILE
 

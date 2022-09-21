@@ -2,8 +2,6 @@ from import_and_process_data import convert_to_numpy_data
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-import pandas as pd
-from itertools import chain
 
 """This code detects coughs, filters the coughs and returns different cough parameters
 
@@ -14,16 +12,9 @@ Date: July 2022
 def coughdetection(p_es, p_air, volume, flow):
     
     FSAMP = 100
-    p_es_signal, p_air_signal, volume_signal, flow_signal, time_signal = \
-        convert_to_numpy_data(p_es, p_air, volume, flow, FSAMP)
+    p_es_signal,p_air_signal,volume_signal,flow_signal,F_signal= convert_to_numpy_data(p_es,p_air,volume,flow,FSAMP)
    
-    print(len(p_es_signal))
-    print(len(p_es))
     peakspositive, _ = find_peaks(p_es_signal, prominence=1)
-    peaksnegative, _ = find_peaks(-p_es_signal, prominence=1)
-  
-    peakstotal = np.append(peakspositive,peaksnegative)
-    peakssorted = sorted(peakstotal)
 
     peakvalues_positive = p_es_signal[peakspositive]
     def running_mean(x, N, mean_total):

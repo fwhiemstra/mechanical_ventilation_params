@@ -172,7 +172,7 @@ rr = respiratory_rate_fft(volume_trim)
     volume_trim, p_es_trim, flow_trim, rr)
 #%%
 # Calculating tidal volume
-[tidal_volume, mean_tidal_volume] = tidal_volume_calculator(start_insp, end_insp, volume_trim)
+[tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
 #%%
 # Calculating PEEP
 [peep, mean_peep] = peep_calculator(start_insp, p_air_trim)
