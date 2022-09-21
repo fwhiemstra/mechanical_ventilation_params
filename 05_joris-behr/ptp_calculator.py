@@ -26,7 +26,6 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
     for start, end in zip(start_insp, end_insp):
         try:
             p_single_breath = pressure[start:end]  # Take pressure values per inspiration
-
             # Translate the curve such that the maximum pressure of P_es equals zero and the minimum pressure of P_aw and P_tp equals zero
             if name == 'p_es':
                 max_p_single_breath = max(p_single_breath)

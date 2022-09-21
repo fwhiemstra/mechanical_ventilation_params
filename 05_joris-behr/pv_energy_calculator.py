@@ -7,8 +7,7 @@ Date: February 2022
 """
 import numpy as np
 from numpy import mean
-import matplotlib.pyplot as plt
-from constants import CONV_FACTOR, FS
+from constants import CONV_FACTOR
 from intersect import intersection
 
 
@@ -90,7 +89,7 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 # First, the intersection between the inspiratory leg and the expiratory leg must be determined
                 intersect_pres, intersect_vol = intersection(pres_insp, vol_insp, pres_exp, vol_exp)
 
-                # If the intersection is between volume 0-100 mL, this becomes the minimum point of the HA
+                # If the intersection is between volume 0-150 mL, this becomes the minimum point of the HA
                 vol_150 = []
                 pres_150 = []
                 ind_150 = []
@@ -108,11 +107,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                         except:
                             pvenergyerror +=1
                             continue
+            
                 if len(vol_150) > 0:
                     try:
-                        intrs_vol = max(vol_150)
-                        intrs_ind = vol_150.index(intrs_vol)
-                        intrs_pres = pres_150[intrs_ind]
+                        intrs_vol = max(vol_150)        
                         ind_insp = next(x[0] for x in enumerate(vol_insp) if x[1] >= intrs_vol)
                         ind_exp = next(x[0] for x in enumerate(vol_exp) if x[1] <= intrs_vol)
                         pres_insp = pres_insp[ind_insp:len(pres_insp)]
