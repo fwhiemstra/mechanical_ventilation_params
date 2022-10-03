@@ -28,7 +28,6 @@ def graphs_raw_data(p_es, p_air, volume, flow, fs_):
     
 
     fig = plt.figure()
-
     ax1 = plt.subplot2grid((2, 2), (0, 0))
     ax2 = plt.subplot2grid((2, 2), (1, 0), sharex=ax1)
     ax3 = plt.subplot2grid((2, 2), (0, 1), sharex=ax1)

@@ -91,13 +91,13 @@ graph = 0
 
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\mixed_mode\002\W_Hamilton-C6__220322095853_Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
 output_xlsx_file = []
 
 if annotation == 1:
     [p_air, p_es, flow, volume, artefact_timestamp, artefact_timestamp_compressed ] = annotate_import(input_file, input_annotation, FS)
 else:
-    [p_air, p_es, flow, volume] = import_data(input_file)
+    [p_air, p_es, flow, volume,breath_no] = import_data(input_file)
 
 #%%
 """ Set variables"""
@@ -117,7 +117,7 @@ if exportCSV ==1:
 """Artefact detection"""
 # detects coughs, filters the coughs and returns a list with cough parameters
 if artefactdetection == 1:
-    p_es,p_air,flow,volume,artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow)
+    p_es,p_air,flow,volume,artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow,breath_no)
     #if number_coughs != 0 :
         # returns the cough parameters in a table
         # print_results(patient_id, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs )
@@ -250,9 +250,9 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 #%%
 """ Display of the results """
 # Show graphs
-# graphs(
-#     p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,
-#     end_insp_values, start_insp_values, segment_time_sec, pressure_type)
+graphs(
+    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,
+    end_insp_values, start_insp_values, segment_time_sec, pressure_type)
 
 # Show summary of the results
 # summary( 

@@ -17,11 +17,19 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
     """
 
     # Variables
+    # separation = round(0.3 * (1/rr_) * 60 * FS)
+    # dist = 40
+    # close_dist = 30
+    # amplitude = 100
+    # end_insp_sep = 50
+    # inspirationerror = 0
+
+    # Variables depending on sampling frequency
     separation = round(0.3 * (1/rr_) * 60 * FS)
-    dist = 40
-    close_dist = 30
+    dist = round(0.4*FS)
+    close_dist = 0.3*FS
     amplitude = 100
-    end_insp_sep = 50
+    end_insp_sep = round(0.5*FS)
     inspirationerror = 0
 
     """ Find where flow == 0 """
