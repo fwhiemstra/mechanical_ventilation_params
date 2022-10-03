@@ -15,8 +15,8 @@ def hysteresis_area(start, pv_e_breath):
     """
     Returns pv_p_breath, mean_pv_p_breath
     """
-    print(f'length pv_p = {len(pv_e_breath)}')
-    print(f'start = {len(start)}')
+    # print(f'length pv_p = {len(pv_e_breath)}')
+    # print(f'start = {len(start)}')
     # Calculate power per breath [J/min]]
     pv_p_breath = []
     hysteresis_error = 0

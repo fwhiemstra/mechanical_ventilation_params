@@ -91,7 +91,7 @@ graph = 0
 
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\11\17_220210101541_Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
 output_xlsx_file = []
 
 if annotation == 1:
@@ -118,9 +118,9 @@ if exportCSV ==1:
 # detects coughs, filters the coughs and returns a list with cough parameters
 if artefactdetection == 1:
     p_es,p_air,flow,volume,artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow)
-    if number_coughs != 0 :
+    #if number_coughs != 0 :
         # returns the cough parameters in a table
-        print_results(patient_id, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs )
+        # print_results(patient_id, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs )
 
 """ Artefact scoring"""
 # determines the accuracy of the cough detection, based on annotated data
@@ -250,15 +250,15 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 #%%
 """ Display of the results """
 # Show graphs
-graphs(
-    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,
-    end_insp_values, start_insp_values, segment_time_sec, pressure_type)
+# graphs(
+#     p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,
+#     end_insp_values, start_insp_values, segment_time_sec, pressure_type)
 
 # Show summary of the results
-summary( 
-    patient_id, pressure_type, rr, mean_tidal_volume, mean_peep,
-    air_power, p_tp_mean, p_es_mean, aw_loop_power, tp_loop_power, ptp_es_mean,
-    ptp_tp_mean, tp_peak_mean, tp_swing_mean)
+# summary( 
+#     patient_id, pressure_type, rr, mean_tidal_volume, mean_peep,
+#     air_power, p_tp_mean, p_es_mean, aw_loop_power, tp_loop_power, ptp_es_mean,
+#     ptp_tp_mean, tp_peak_mean, tp_swing_mean)
 
 # Export results to output file
 output_option = params[1]  # 1 = use existing output file, 2 = create new output file

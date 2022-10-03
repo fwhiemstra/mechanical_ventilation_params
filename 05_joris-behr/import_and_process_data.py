@@ -64,7 +64,7 @@ def convert_to_numpy_data(p_es, p_air, volume, flow, FSAMP):
     axs[1, 1].set_ylabel('Flow [mL/sec]')
     axs[1, 1].set_xlabel('Time [sec]')
     # fig.suptitle('Normal recording of spontaneous breathing during MV', fontsize=16)
-    fig.tight_layout()
-    plt.show()
+    # fig.tight_layout()
+    # plt.show()
     # fig.savefig("Oesophageal_peristalsis.png")
     return p_es_data, p_air_data, volume_data, flow_data, time_vector

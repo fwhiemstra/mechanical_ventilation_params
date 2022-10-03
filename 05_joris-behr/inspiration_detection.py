@@ -85,7 +85,7 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
                     # print(end_insp_flow[i-1])
                     # print(start_insp_flow[i])
                     # print(end_insp_flow[i])
-                    # i += 1
+                    i += 1
                 else:
                     del start_insp_flow[i]
                     # print('deleted')
