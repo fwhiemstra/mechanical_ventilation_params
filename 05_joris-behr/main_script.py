@@ -91,7 +91,7 @@ graph = 0
 
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\mixed_mode\002\W_Hamilton-C6__220322095853_Waves_001.txt'
 output_xlsx_file = []
 
 if annotation == 1:
