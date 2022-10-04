@@ -31,6 +31,8 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import pandas as pd
+
+from hamilton_vs_script import ham_vs_script
 my_dir = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\mechanical_ventilation_params\05_joris-behr'
 #my_dir = r'C:\Users\jiddl\Desktop\stage 4\python codes\code-Jill-Oudshoorn'
 os.chdir(my_dir)
@@ -39,7 +41,7 @@ sys.path.append(my_dir)
 # Import modules
 from constants import FS, PRESSURE_TYPE
 from graphical_user_interface import graphical_user_interface
-from import_data import import_data
+from import_and_process_data import import_data
 from pressure_type_detection import pressure_type_detection
 from graphs_raw_data import graphs_raw_data
 from determine_segment import determine_segment
@@ -62,6 +64,7 @@ from annotate_import import annotate_import
 from artefact_scoring import artefact_scoring
 from coughdetection import coughdetection
 from print_results import print_results
+from breaths_hamilton import breaths_hamilton
 
 #%%
 "choises of skipping parts of the script"
@@ -72,28 +75,17 @@ from print_results import print_results
 # 0 = off
 # 1 = on
 
-annotation1 = 0
-artefactdetection = 1
+# Settings
+artefactdetection = 0
 exportCSV = 0
 graph = 0
-#
-
-""" Import and name data """
-# Start and get entries from graphical user interface
-#[annotation, patient_number, params, input_txt_file, input_txt_file_annotation, output_xlsx_file] = graphical_user_interface(annotation1)
-
-
-#
-# # Import data from chosen input file
-# input_file = input_txt_file[0]
-# if annotation == 1:
-#     input_annotation = input_txt_file[1]
-
 annotation = 0
 params = ['234', 2, 'test']
 input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
 output_xlsx_file = []
+#
 
+""" Annotate, Import and name data """
 if annotation == 1:
     [p_air, p_es, flow, volume, artefact_timestamp, artefact_timestamp_compressed ] = annotate_import(input_file, input_annotation, FS)
 else:
@@ -159,8 +151,8 @@ input_filename = PurePath(input_file).stem + PurePath(input_file).suffix
 #%%
 """ General code """
 # Cut recording based on specified segment length and start time
-[volume_trim, flow_trim, p_air_trim, p_es_trim, segment_time_sec, data_length] = trim_recording(
-    rec_delay, FS, p_es, segment_len, volume, flow, p_air, length)
+[volume_trim, flow_trim, p_air_trim, p_es_trim,breath_no_trim, segment_time_sec, data_length] = trim_recording(
+    rec_delay, FS, p_es, segment_len, volume, flow, p_air,breath_no, length)
 
 #%%
 # Calculate respiratory rate - based on median frequency
@@ -170,6 +162,12 @@ rr = respiratory_rate_fft(volume_trim)
 # Detecting the start- and end points of inspiration
 [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
     volume_trim, p_es_trim, flow_trim, rr)
+
+# Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
+[start_insp_ham] = breaths_hamilton(flow_trim,breath_no_trim)
+
+# Calcuating the difference between hamilton and inspiration detection
+ham_vs_script(start_insp,start_insp_ham)
 #%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
@@ -251,7 +249,7 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 """ Display of the results """
 # Show graphs
 graphs(
-    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,
+    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,start_insp_ham,
     end_insp_values, start_insp_values, segment_time_sec, pressure_type)
 
 # Show summary of the results

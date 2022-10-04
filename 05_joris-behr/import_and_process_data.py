@@ -1,12 +1,24 @@
+"""
+Import data from input file
+- import airway pressure, esophegeal pressure, flow and volume from
+  input .txt file from the Hamilton C6 Mechanical Ventilator
+
+Author: Sanne van Deelen
+Date: February 2021
+
+Modified by Joris Behr
+Date: October 2022
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 def convert_dtype(x):
     if not x:
         return ''
     try:
-        return int(x)   
+        return float(x)   
     except:        
         return 0
 
@@ -20,20 +32,10 @@ def import_data(input_x):
     p_es = read_input_file["P-Optional /cmH2O"]  # Esophageal pressure
     flow = read_input_file["Flow /ml/s"]  # Flow
     volume = read_input_file["Volume /ml"]  # Volume
+    breath_no = read_input_file["Breath Number"]
+    
 
-    # p_air = p_air.replace('--', '0')
-    p_air = pd.to_numeric(p_air)
-
-    # p_es = p_es.replace('--', '0')
-    p_es = pd.to_numeric(p_es)
-
-    # volume = volume.replace('--', '0')
-    volume = pd.to_numeric(volume)
-
-    # flow = flow.replace('--', '0')
-    flow = pd.to_numeric(flow)
-
-    return p_air, p_es, flow, volume
+    return p_air, p_es, flow, volume, breath_no
 
 
 def convert_to_numpy_data(p_es, p_air, volume, flow, FSAMP):

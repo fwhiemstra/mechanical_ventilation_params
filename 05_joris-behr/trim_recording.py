@@ -4,16 +4,20 @@ Trim recording to desired length
 
 Author: Sanne van Deelen
 Date: February 2021
+
+Modified by Joris Behr (added breath no)
+Date: October 2022
 """
 
 
-def trim_recording(rec_delay, fs_, p_es, segment_len, volume, flow, p_air, length):
+def trim_recording(rec_delay, fs_, p_es, segment_len, volume, flow, p_air, breath_no, length):
     """
     Returns:
     - trimmed volume values
     - trimmed flow values
     - trimmed airway pressure values
     - trimmed esophageal pressure values
+    - trimmed breath no
     - segment time
     - total segment length
     """
@@ -22,6 +26,7 @@ def trim_recording(rec_delay, fs_, p_es, segment_len, volume, flow, p_air, lengt
     flow_list = flow.tolist()
     pressure_list = p_air.tolist()
     pres_es_list = p_es.tolist()
+    breath_no_list = breath_no.tolist()
 
     if segment_len == 0:
         # If segment length is not defined, use all datapoints untill end of data
@@ -43,6 +48,7 @@ def trim_recording(rec_delay, fs_, p_es, segment_len, volume, flow, p_air, lengt
     flow_trim = flow_list[start:end]
     p_air_trim = pressure_list[start:end]
     p_es_trim = pres_es_list[start:end]
+    breath_no_trim = breath_no_list[start:end]
     segment_time_sec = [i / fs_ for i in range(0, data_length)]
 
-    return volume_trim, flow_trim, p_air_trim, p_es_trim, segment_time_sec, data_length
+    return volume_trim, flow_trim, p_air_trim, p_es_trim, breath_no_trim, segment_time_sec, data_length
