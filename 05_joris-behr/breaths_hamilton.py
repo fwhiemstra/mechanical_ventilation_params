@@ -10,13 +10,14 @@ import math
 from import_and_process_data import import_data
 from coughdetection import coughdetection
 from graphs_raw_data import graphs_raw_data
-from constants import FS
+from constants import FS, ADJ_HAM
 from import_and_process_data import convert_to_numpy_data
 from matplotlib import pyplot as plt
 from respiratory_rate_fft import respiratory_rate_fft
 from inspiration_detection import inspiration_detection
 from trim_recording import trim_recording
 from determine_segment import determine_segment
+
 
 
 def breaths_hamilton(flow,breath_no):
@@ -49,7 +50,7 @@ def breaths_hamilton(flow,breath_no):
 
 
 if __name__ == '__main__':
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\10\Waves_010.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']
@@ -79,8 +80,8 @@ if __name__ == '__main__':
 
     #Determining respiratory rate for inpiration_detection
     rr = respiratory_rate_fft(volume_trim)
-    [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
-    volume, p_es, flow, rr)
+    # [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
+    # volume, p_es, flow, rr)
     #Calculating start indices by using hamilton data vs own script
     [start_insp_ham] = breaths_hamilton(flow_trim,breath_no_trim) 
 
