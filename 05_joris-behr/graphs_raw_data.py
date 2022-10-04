@@ -63,6 +63,6 @@ def graphs_raw_data(p_es, p_air, volume, flow, fs_):
 
 if __name__ == '__main__':
     # If run seperately from main, visualise data
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\2\Waves_002.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     graphs_raw_data(p_es, p_air, volume, flow, FS)

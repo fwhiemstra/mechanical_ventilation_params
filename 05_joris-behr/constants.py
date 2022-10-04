@@ -46,3 +46,5 @@ CONV_FACTOR = 0.000098
 """ fraction of breath time used for minimal separation of breaths
 (0.7 is obtained from MATLAB script, unknown why this number is chosen) """
 RR_SEP_FRAC = 0.7
+
+ADJ_HAM = 20

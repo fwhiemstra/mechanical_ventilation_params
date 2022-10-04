@@ -81,7 +81,7 @@ exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\1__211006132800_Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\5\Waves_005.txt'
 output_xlsx_file = []
 #
 
@@ -167,7 +167,7 @@ rr = respiratory_rate_fft(volume_trim)
 [start_insp_ham] = breaths_hamilton(flow_trim,breath_no_trim)
 
 # Calcuating the difference between hamilton and inspiration detection
-ham_vs_script(start_insp,start_insp_ham)
+ham_vs_script(start_insp,start_insp_ham,flow_trim)
 #%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
