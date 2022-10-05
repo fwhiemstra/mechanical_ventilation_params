@@ -76,12 +76,12 @@ from breaths_hamilton import breaths_hamilton
 # 1 = on
 
 # Settings
-artefactdetection = 0
+artefactdetection = 1
 exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\5\Waves_005.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\9\Waves_009.txt'
 output_xlsx_file = []
 #
 
@@ -109,7 +109,7 @@ if exportCSV ==1:
 """Artefact detection"""
 # detects coughs, filters the coughs and returns a list with cough parameters
 if artefactdetection == 1:
-    p_es,p_air,flow,volume,artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow,breath_no)
+    p_es,p_air,flow,volume,breath_no, artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow,breath_no)
     #if number_coughs != 0 :
         # returns the cough parameters in a table
         # print_results(patient_id, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs )

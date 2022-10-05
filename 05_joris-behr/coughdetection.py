@@ -21,10 +21,9 @@ def coughdetection(p_es, p_air, volume, flow,breath_no):
     
     #Determing constants based on data frequency
     COUGH_REMOVE_SIZE = round(0.1*FS)
-    print(COUGH_REMOVE_SIZE)
     RUNNING_MEAN_SIZE = round(1*FS)
-    print(RUNNING_MEAN_SIZE)
 
+    # Convert data for easier handling. Long input due to function requirements.
     p_es_signal,p_air_signal,volume_signal,flow_signal, F_signal= convert_to_numpy_data(p_es,p_air,volume,flow,FS)
     peakspositive, _ = find_peaks(p_es_signal, prominence=1)
     peakvalues_positive = p_es_signal[peakspositive]
@@ -39,8 +38,8 @@ def coughdetection(p_es, p_air, volume, flow,breath_no):
     artefact_peaks = list(set(artefact_peaks))
     
     # Plots to show the found artefact peaks
-    plt.plot(artefact_peaks,p_es_signal[artefact_peaks], "ob"); plt.plot(p_es_signal)
-    plt.show()
+    # plt.plot(artefact_peaks,p_es_signal[artefact_peaks], "ob"); plt.plot(p_es_signal)
+    # plt.show()
 
     # remove more than the detected cough in order to get better clean data. 
     artefact_peaks_remove = []
@@ -149,6 +148,7 @@ def coughdetection(p_es, p_air, volume, flow,breath_no):
         p_air_clean = p_air[cleandata1]
         flow_clean = flow[cleandata1]
         volume_clean = volume[cleandata1]
+        breath_no_clean = breath_no[cleandata1]
 
         length = len(p_es_clean)
         time_sec = [i / FS for i in range(0, length)]
@@ -160,7 +160,7 @@ def coughdetection(p_es, p_air, volume, flow,breath_no):
         #axs[1].plot(time_sec,p_es_clean)
         #plt.show()
 
-        return p_es_clean,p_air_clean,flow_clean,volume_clean, artefact_detection,cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs    
+        return p_es_clean,p_air_clean,flow_clean,volume_clean, breath_no_clean, artefact_detection,cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs    
     else:   
         artefact_detection =0
         cough_time_total =0
