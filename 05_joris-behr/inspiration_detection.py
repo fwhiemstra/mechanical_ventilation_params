@@ -89,17 +89,9 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
             i = 1
             while i < len(end_insp_flow):
                 if start_insp_flow[i] < end_insp_flow[i] and start_insp_flow[i] > end_insp_flow[i-1]:
-                    # print(i)
-                    # print(end_insp_flow[i-1])
-                    # print(start_insp_flow[i])
-                    # print(end_insp_flow[i])
                     i += 1
                 else:
                     del start_insp_flow[i]
-                    # print('deleted')
-                    # print(end_insp_flow[i-1])
-                    # print(start_insp_flow[i])
-                    # print(end_insp_flow[i])
 
 
         if len(end_insp_flow) > len(start_insp_flow):
