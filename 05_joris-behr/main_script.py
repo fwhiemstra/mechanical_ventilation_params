@@ -81,7 +81,7 @@ exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\7\Waves_007.txt'
 output_xlsx_file = []
 #
 
@@ -160,17 +160,19 @@ rr = respiratory_rate_fft(volume_trim)
 
 #%%
 # Detecting the start- and end points of inspiration
-[start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
-    volume_trim, p_es_trim, flow_trim, rr)
+# [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
+#     volume_trim, p_es_trim, flow_trim, rr)
+
+#%%
 
 # Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
-start_insp_ham, start_exp_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
+start_insp, end_insp, start_insp_values, end_insp_values = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
 # Calcuating the difference between hamilton and inspiration detection
-ham_vs_script(start_insp,start_insp_ham,flow_trim)
+# ham_vs_script(start_insp,start_insp_ham,flow_trim)
 
-# start_insp = start_exp_ham
-# end_insp = start_exp_ham
+# start_insp = start_insp_ham.tolist()
+# end_insp = start_exp_ham.tolist()
 #%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
@@ -252,8 +254,8 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 """ Display of the results """
 # Show graphs
 graphs(
-    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,start_insp_ham,
-    end_insp_values, start_insp_values, segment_time_sec, pressure_type)
+    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
+    segment_time_sec, pressure_type)
 
 # Show summary of the results
 # summary( 
