@@ -164,10 +164,13 @@ rr = respiratory_rate_fft(volume_trim)
     volume_trim, p_es_trim, flow_trim, rr)
 
 # Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
-start_insp_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
+start_insp_ham, start_exp_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
 # Calcuating the difference between hamilton and inspiration detection
 ham_vs_script(start_insp,start_insp_ham,flow_trim)
+
+# start_insp = start_exp_ham
+# end_insp = start_exp_ham
 #%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
