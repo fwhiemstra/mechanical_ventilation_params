@@ -42,18 +42,18 @@ def breaths_hamilton(flow,breath_no,rr):
     # Attempt to improve start finding
     start_insp_improved = np.asarray(start_insp).flatten()
     start_insp_improved = start_insp_improved - ADJ_HAM
-    start_insp_improved = [i for i in start_insp_improved if flow[i]<200 and flow[i] > -200]
+    start_insp_improved = [i for i in start_insp_improved if flow[i]<250 and flow[i] > -250] # hier morgelijk nog iets doen met de median?
 
     # Remove values that are too close to eachother
     # while i < len(start_insp_improved):
     for idx,val in enumerate(start_insp_improved):
-        if separation < start_insp_improved[idx] - start_insp_improved[idx-1] and flow[val+20] > 100:
+        if (separation < start_insp_improved[idx] - start_insp_improved[idx-1]) and (flow[val+20] > 100):
             pass
         else:
             del start_insp_improved[idx]
 
     # Search for nearby flow values that are closer to 0
-    near = 20
+    near = 40
     start_insp_improved_2 = np.zeros(np.shape(start_insp_improved))
     for idx, val in enumerate(start_insp_improved):
         if val - near < 0:
@@ -62,7 +62,7 @@ def breaths_hamilton(flow,breath_no,rr):
             start_insp_improved_2[idx] = find_nearest(flow[val-near:-1],0) +val-near
         else:
             a = find_nearest(flow[val-near:val],0)+val-near
-            b = find_nearest(flow[val:val+near],0)+val+near
+            b = find_nearest(flow[val:val+near],0)+val
             if abs(flow[a]) < abs(flow[b]):
                 start_insp_improved_2[idx] = a
             else:
@@ -79,26 +79,26 @@ def breaths_hamilton(flow,breath_no,rr):
 
     # figures
     fig = plt.figure()
-    ax1 = fig.add_subplot(2,1,1)
-    ax2 = fig.add_subplot(2,1,2,sharex= ax1)
+    ax1 = fig.add_subplot(1,1,1)
+    # ax2 = fig.add_subplot(2,1,2,sharex= ax1)
     ham_insp = ax1.scatter(start_insp_time, flow[start_insp], c='r')
     ham_insp_impr = ax1.scatter(start_insp_time_improved, flow[start_insp_improved], c='g')
     ham_insp_impr2 = ax1.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
     ax1.plot(time_sec, flow, 'k')
     # ax1.legend(end_exp_scatter,'End of inspiration', loc='upper right', shadow=True)
-    ax2.plot(time_sec,flow,'k')
-    ax2.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
+    # ax2.plot(time_sec,flow,'k')
+    # ax2.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
     ax1.set_title(r'flow')
     ax1.set_ylabel(r'Pressure [cmH2O]')
     ax1.set_xlabel(r'Time [s]')
     plt.tight_layout()
     plt.show()
     
-    return start_insp
+    return start_insp_improved_2
 
 
 if __name__ == '__main__':
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\4\Waves_004.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\3\Waves_003.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     #Calculating start indices by using hamilton data vs own script
     [start_insp_ham] = breaths_hamilton(flow,breath_no,rr) 
-    print(len(start_insp_ham))
+    # print(len(start_insp_ham))
 
 
 

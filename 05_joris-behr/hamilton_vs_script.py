@@ -23,12 +23,12 @@ def ham_vs_script(start_insp,start_insp_ham,flow):
         print(f'median difference {diff_index_median}')
     except: 
         print('Difference could not be determined due to difference in length')
-    start_insp_ham_adj = start_insp_ham - ADJ_HAM
+    # start_insp_ham_adj = start_insp_ham - ADJ_HAM
     flow = np.array(flow)
     flow_insp_script = flow[start_insp]
     flow_insp_ham = flow[start_insp_ham]
-    flow_insp_ham_adj = flow[start_insp_ham_adj]
+    # flow_insp_ham_adj = flow[start_insp_ham_adj]
     print(f'script mean inspiratory start  flow is {st.mean(flow_insp_script)} and std is {st.stdev(flow_insp_script)}')
     print(f'hamilton mean inpiratory start flow is {st.mean(flow_insp_ham)} and std is {st.stdev(flow_insp_ham)}')
-    print(f'hamilton adjusted ({ADJ_HAM} steps) mean inpiratory start flow is {st.mean(flow_insp_ham_adj)} and std is {st.stdev(flow_insp_ham_adj)}')
+    # print(f'hamilton adjusted ({ADJ_HAM} steps) mean inpiratory start flow is {st.mean(flow_insp_ham_adj)} and std is {st.stdev(flow_insp_ham_adj)}')
     # print(diff_index)

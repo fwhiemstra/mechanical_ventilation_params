@@ -81,7 +81,7 @@ exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\9\Waves_009.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
 output_xlsx_file = []
 #
 
@@ -164,7 +164,7 @@ rr = respiratory_rate_fft(volume_trim)
     volume_trim, p_es_trim, flow_trim, rr)
 
 # Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
-[start_insp_ham] = breaths_hamilton(flow_trim,breath_no_trim)
+start_insp_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
 # Calcuating the difference between hamilton and inspiration detection
 ham_vs_script(start_insp,start_insp_ham,flow_trim)
