@@ -85,7 +85,7 @@ def breaths_hamilton(flow,breath_no,rr):
     for idx,val in enumerate(start_insp_improved_2[0:-2]):
         for i in range(val+t_blank, val+t_insp_est[idx]):
             if flow[i] >0 and flow[i+2] <0 and flow[i+dist] <-100:
-                end_insp_ham[idx] = i+1 
+                end_insp_ham[idx] = i
                 # idx+=1
                 # i = 0
             else:
@@ -134,7 +134,7 @@ def breaths_hamilton(flow,breath_no,rr):
 
 
 if __name__ == '__main__':
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\5\Waves_005.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\10\Waves_010.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     # volume, p_es, flow, rr)
 
     #Calculating start indices by using hamilton data vs own script
-    start_insp_ham, end_insp_ham= breaths_hamilton(flow,breath_no,rr) 
+    start_insp_ham, end_insp_ham, start_insp_values, end_insp_values= breaths_hamilton(flow,breath_no,rr) 
     # print(len(start_insp_ham))
 
 

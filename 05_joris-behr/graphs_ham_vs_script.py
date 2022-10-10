@@ -15,7 +15,7 @@ import numpy as np
 from constants import FS, PRESSURE_TYPE, ADJ_HAM
 
 
-def graphs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_ham, start_insp,start_insp_ham,
+def graphs_vs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_ham, start_insp,start_insp_ham,
            end_insp_values, start_insp_values, segment_time_sec, pressure_type):
 
     # grid plot

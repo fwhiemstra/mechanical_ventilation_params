@@ -48,6 +48,7 @@ from determine_segment import determine_segment
 from trim_recording import trim_recording
 from respiratory_rate_fft import respiratory_rate_fft
 from inspiration_detection import inspiration_detection
+from inspiration_detection_2 import inspiration_detection_2
 from tidal_volume_calculator import tidal_volume_calculator
 from peep_calculator import peep_calculator
 from ptp_calculator import ptp_calculator
@@ -56,6 +57,7 @@ from energy_calculator import energy_calculator
 from pv_energy_calculator import pv_energy_calculator
 from sd_se_statistics import sd_se_statistics
 from graphs import graphs
+from graphs_ham_vs_script import graphs_vs
 from summary import summary
 from select_output_file import select_output_file
 from hysteresis_area import hysteresis_area
@@ -81,7 +83,7 @@ exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\7\Waves_007.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
 output_xlsx_file = []
 #
 
@@ -163,10 +165,12 @@ rr = respiratory_rate_fft(volume_trim)
 # [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
 #     volume_trim, p_es_trim, flow_trim, rr)
 
+start_insp, start_insp_values, end_insp, end_insp_values = inspiration_detection_2(flow_trim, rr)
+
 #%%
 
 # Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
-start_insp, end_insp, start_insp_values, end_insp_values = breaths_hamilton(flow_trim,breath_no_trim, rr)
+# start_insp_ham, end_insp_ham, start_insp_values_ham, end_insp_values_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
 # Calcuating the difference between hamilton and inspiration detection
 # ham_vs_script(start_insp,start_insp_ham,flow_trim)
@@ -256,6 +260,10 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 graphs(
     p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
     segment_time_sec, pressure_type)
+
+#graphs_vs( 
+    # p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_ham, start_insp,start_insp_ham,
+    #        end_insp_values, start_insp_values, segment_time_sec, pressure_type)
 
 # Show summary of the results
 # summary( 
