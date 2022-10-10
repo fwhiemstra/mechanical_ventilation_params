@@ -50,7 +50,7 @@ def inspiration_detection_2(flow,rr):
                 pass
 
     flow_diff = np.diff(flow)
-    idx_peak, _= find_peaks(flow_diff, height=60,threshold=10,distance=separation)
+    idx_peak, _= find_peaks(flow_diff, height=60,distance=separation)
     idx_peak = idx_peak[flow[idx_peak]>-100]
     
     for i, idx in enumerate(idx_peak):
