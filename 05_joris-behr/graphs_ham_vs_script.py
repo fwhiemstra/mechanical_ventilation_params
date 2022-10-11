@@ -1,5 +1,5 @@
 """
-Plot the graphs
+Plot the graphs to compare detection methods
 
 Author: Sanne van Deelen
 Date: February 2021
@@ -9,6 +9,9 @@ Date: October 2021
 
 Modified by Anne Meester
 Date: February 2022
+
+Modified by Joris Behr
+Date: October 2022
 """
 import matplotlib.pyplot as plt
 import numpy as np

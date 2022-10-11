@@ -11,8 +11,7 @@ Modified by Anne Meester
 Date: February 2022
 """
 import matplotlib.pyplot as plt
-import numpy as np
-from constants import FS, PRESSURE_TYPE, ADJ_HAM
+from constants import FS, PRESSURE_TYPE
 
 
 def graphs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values,start_insp_values,
