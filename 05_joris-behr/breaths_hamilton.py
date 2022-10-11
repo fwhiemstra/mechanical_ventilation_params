@@ -1,5 +1,5 @@
 """
-Script to detect inpsiration and expiration based on hamilton data
+Script to detect inpsiration and expiration based on hamilton breath number data
 
 Author: Joris Behr
 Date: October 2022
@@ -20,40 +20,41 @@ from trim_recording import trim_recording
 from determine_segment import determine_segment
 
 def find_nearest(array, value):
+    """Function to find value in an array that is nearest to a given value"""
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return idx
 
 def breaths_hamilton(flow,breath_no,rr):
-    #parameters
-    time_sec = [i / FS for i in range(0, len(flow))] # Time in seconds for plot
-    separation = round(0.3 * (1/rr) * 60 * FS)
-    dist = round(0.2*FS)
+    """Function to find the start and end inspiration by using the hamilton breath number data. """
+    # Parameters
+    separation = round(0.3 * (1/rr) * 60 * FS) # Minimal seperation between to inspirations
+    dist = round(0.2*FS)                       # Distance between start inspiration and flow threshold
 
+    # Data transformation
     if type(breath_no) == list:
         breath_no = np.array(breath_no)
         flow = np.array(flow)
     else:
-        breath_no = breath_no.to_numpy().flatten()       # Changing type to numpy array for calculation purposes
-        flow = flow.to_numpy().flatten()                 # Idem,  MIGHT CHANGE WITH IMPORT MODULE
+        breath_no = breath_no.to_numpy().flatten()
+        flow = flow.to_numpy().flatten()
 
-    #Finding start inspiratory indices and transforming to time [s] 
+       
+    #Finding start inspiratory indices based on change in breath number
     start_insp = np.where(np.diff(breath_no) > 0)
 
-    # Attempt to improve start finding
+    # Improving inspiration by: 1) Shifting time of start and 2) too high/low values
     start_insp_improved = np.asarray(start_insp).flatten()
     start_insp_improved = start_insp_improved - ADJ_HAM
-    start_insp_improved = [i for i in start_insp_improved if flow[i]<250 and flow[i] > -250] # hier morgelijk nog iets doen met de median?
+    start_insp_improved = [i for i in start_insp_improved if flow[i]<250 and flow[i] > -250]
 
     # Remove values that are too close to eachother or arent followed by positive flow
-    
     val_del = list()
     for idx,val in enumerate(start_insp_improved):
         if (separation < start_insp_improved[idx] - start_insp_improved[idx-1]) and (flow[val+dist] > 100):
             pass
         else:
             val_del.append(val)
-
     start_insp_improved = [ i for i in start_insp_improved if i not in val_del]
 
 
@@ -74,36 +75,37 @@ def breaths_hamilton(flow,breath_no,rr):
             else:
                 start_insp_improved_2[idx] = b
 
+    #Changing datatype so it can be used as index
     start_insp_improved_2 = start_insp_improved_2.astype(int)
     
 
-    # Calculating end inspiratory 
+    # Calculating end inspiratory time by searching for point where
+    # flow shifts from positive to negative and is followed by -100ml/s flow.
     t_insp_est = (0.6*np.diff(start_insp_improved_2)).astype(int)
     t_blank = 50
     end_insp_ham = np.zeros(np.shape(t_insp_est))
-    
+
     for idx,val in enumerate(start_insp_improved_2[0:-2]):
         for i in range(val+t_blank, val+t_insp_est[idx]):
-            if flow[i] >0 and flow[i+2] <0 and flow[i+dist] <-100:
+            if flow[i] >0 and flow[i+1] <0 and flow[i+dist] <-100:
                 end_insp_ham[idx] = i
-                # idx+=1
-                # i = 0
             else:
                 pass
+    
+    #Changing datatype so it can be used as index
     end_insp_ham = end_insp_ham.astype(int)
+
+    # Zeros have to be removed, corresponding start values as well
     id_0 = np.asarray(np.where(end_insp_ham==0))
     end_insp_ham = np.asarray([v for i,v in enumerate(end_insp_ham) if i not in id_0])
     start_insp_improved_2 = np.asarray([v for i,v in enumerate(start_insp_improved_2) if i not in id_0])
     end_insp_ham = end_insp_ham.astype(int) 
 
-    print(len(end_insp_ham),len(start_insp_improved_2))
-
-
     #remove last insp value for equal array lengths
     start_insp_improved_2 = start_insp_improved_2[0:-1]
 
     #computing time from start indices
-    start_insp_time = [i / FS for i in start_insp]
+    time_sec = [i / FS for i in range(0, len(flow))] # Time in seconds for plot
     start_insp_time_improved = [i / FS for i in start_insp_improved]
     start_insp_time_improved_2= [i / FS for i in start_insp_improved_2]
     end_insp_time = [i / FS for i in end_insp_ham]
@@ -115,15 +117,12 @@ def breaths_hamilton(flow,breath_no,rr):
     # figures
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
-    # ax2 = fig.add_subplot(2,1,2,sharex= ax1)
-    # ham_insp = ax1.scatter(start_insp_time, flow[start_insp], c='r')
     ham_insp_impr = ax1.scatter(start_insp_time_improved, flow[start_insp_improved], c='g')
     ham_insp_impr2 = ax1.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
     ham_exp = ax1.scatter(end_insp_time,flow[end_insp_ham], marker="x", c='y')
-    ax1.plot(time_sec, flow, 'k')
-    # ax1.legend(end_exp_scatter,'End of inspiration', loc='upper right', shadow=True)
-    # ax2.plot(time_sec,flow,'k')
-    # ax2.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
+    ax1.legend((ham_insp_impr,ham_insp_impr2,ham_exp),
+            ('Hamilton inspiration + time shift', 'Hamilton inspiration improved', 'Hamilton expiration'), loc='upper right', shadow=True)
+    ax1.plot(time_sec, flow, 'b')
     ax1.set_title(r'flow')
     ax1.set_ylabel(r'Pressure [cmH2O]')
     ax1.set_xlabel(r'Time [s]')
@@ -134,6 +133,14 @@ def breaths_hamilton(flow,breath_no,rr):
 
 
 if __name__ == '__main__':
+    """If script is run as main script, the following will be done
+    1. file is imported
+    2. coughs are filtered
+    3. data is showed in graph
+    4. data can be trimmed
+    5. respiratory rate is determined
+    6. inspiration is determined based on hamilton"""
+
     input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\10\Waves_010.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
@@ -141,7 +148,7 @@ if __name__ == '__main__':
 
     p_es,p_air,flow,volume,breath_no, artefact_detection, cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow,max_cough_peak_flow,  percentage_hard_coughs = coughdetection(p_es, p_air, volume, flow,breath_no)
 
-    # Graph of full (raw) data
+    # Graph of full data
     graphs_raw_data(p_es, p_air, volume, flow, FS)
 
     # #Selecting part of data
@@ -166,12 +173,10 @@ if __name__ == '__main__':
 
     #Determining respiratory rate for inpiration_detection
     rr = respiratory_rate_fft(volume)
-    # [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
-    # volume, p_es, flow, rr)
 
     #Calculating start indices by using hamilton data vs own script
     start_insp_ham, end_insp_ham, start_insp_values, end_insp_values= breaths_hamilton(flow,breath_no,rr) 
-    # print(len(start_insp_ham))
+
 
 
 
