@@ -81,12 +81,15 @@ def breaths_hamilton(flow,breath_no,rr):
 
     # Calculating end inspiratory time by searching for point where
     # flow shifts from positive to negative and is followed by -100ml/s flow.
-    t_insp_est = (0.6*np.diff(start_insp_improved_2)).astype(int)
+    
+    # region of interest to search for inspiration after inspiration
+    exp_roi = (0.6*np.diff(start_insp_improved_2)).astype(int) 
+    # Defining blanking period to prevent finding inspiration
     t_blank = 50
-    end_insp_ham = np.zeros(np.shape(t_insp_est))
+    end_insp_ham = np.zeros(np.shape(exp_roi))
 
-    for idx,val in enumerate(start_insp_improved_2[0:-2]):
-        for i in range(val+t_blank, val+t_insp_est[idx]):
+    for idx,val in enumerate(start_insp_improved_2[0:-1]):
+        for i in range(val+t_blank, val+exp_roi[idx]):
             if flow[i] >0 and flow[i+1] <0 and flow[i+dist] <-100:
                 end_insp_ham[idx] = i
             else:
