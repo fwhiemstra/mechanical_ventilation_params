@@ -54,7 +54,6 @@ def inspiration_detection_2(flow,rr):
     peak_test, properties= find_peaks(flow_diff,height=10,distance=separation)
     min_peak_height = 0.7*median(properties['peak_heights'])
     idx_peak, _ = find_peaks(flow_diff,height=min_peak_height,distance=separation)
-    print(min_peak_height)
     # idx_peak = idx_peak[flow[idx_peak]>-100]
     xpeak = idx_peak.copy()
     
@@ -69,14 +68,14 @@ def inspiration_detection_2(flow,rr):
                 try:
                     idx_peak[i] = id_0[-1]
                 except:
-                    print(idx)
+                    # print(idx)
                     idx_remove.append(idx)
             else:
                 id_0 = np.where(np.diff(np.sign(flow[idx-400:idx])))[0]
                 try:
                     idx_peak[i] = id_0[-1]+idx-400
                 except:
-                    print(idx)
+                    # print(idx)
                     idx_remove.append(idx)
         elif flow[idx]<-40:
             if idx + 400 >len(flow):
@@ -84,7 +83,7 @@ def inspiration_detection_2(flow,rr):
                 try:
                     idx_peak[i] = id_0[0]
                 except:
-                    print(idx)
+                    # print(idx)
                     idx_remove.append(idx)
             else:
                 id_0 = np.where(np.diff(np.sign(flow[idx:idx+200])))[0]
@@ -93,7 +92,7 @@ def inspiration_detection_2(flow,rr):
                     idx_peak[i] = id_0[0]+idx
                     # print(id_0)
                 except:
-                    print(idx)
+                    # print(idx)
                     idx_remove.append(idx)
         else:
             idx_peak[i] = idx
@@ -108,19 +107,50 @@ def inspiration_detection_2(flow,rr):
     # Calculating end inspiratory time by searching for point where
     # flow shifts from positive to negative and is followed by -100ml/s flow.
     # region of interest to search for inspiration after inspiration
-    exp_roi = (0.5*np.diff(start_insp)).astype(int) 
+    exp_roi = (0.6*np.diff(start_insp)).astype(int) 
     t_blank = 20
     end_insp = list()
 
     for idx, val in enumerate(start_insp[0:-1]):
         for i in range(val+t_blank,val+exp_roi[idx]):
-            if flow[i] >= 0 and flow[i+1]< 0 and flow[i+50] <=-100:
-                end_insp.append(i)
-        
+            if flow[i] >= 0 and flow[i+1]< 0 and flow[i+10] <=-100:          
+                if len(end_insp) == 0:
+                    end_insp.append(i)
+                elif end_insp[-1] +2 < i: #Toegevoegde voorwaarde omdat er soms een kronkel zit in expiratoire pad
+                    end_insp.append(i)
 
+    exp_peak = list()
+    val_start_remove = list()
+    for val1, val2 in zip(start_insp[0:-1], start_insp[1:]):
+        peak, _ = find_peaks(-flow_diff[val1:val2],distance=separation, height=100)
+        exp_peak_loc = peak[0]+val1
+        # exp_peak.append(peak[0]+val1)
+        if flow[exp_peak_loc] <0:
+            new_peak = np.where((np.flip(flow[exp_peak_loc-10:exp_peak_loc]))>0)[0]
+            if len(new_peak) >0:
+                exp_peak.append(exp_peak_loc-new_peak[0]-1)
+            else:
+                print(val1)
+                val_start_remove.append(val1)
+
+        elif flow[exp_peak_loc] >0:
+            new_peak = np.where((flow[exp_peak_loc:exp_peak_loc+10])<=0)[0]
+            if len(new_peak) >0:
+                exp_peak.append(exp_peak_loc+new_peak[0]-1)
+            else:
+                print(exp_peak_loc)
+                val_start_remove.append(val1)
+
+        else:
+            exp_peak.append(exp_peak_loc)
+    print(val_start_remove)
+    start_insp = [v for v in start_insp if v not in val_start_remove]
+    print(np.where(start_insp ==val_start_remove))
+    
+    print(f'Length end insp is {len(end_insp)}\nLength end insp peak is {len(exp_peak)}')
     # TODO: 
     # Evt. zorgen dat per stuk maar naar 1 waarde wordt gezocht
-    # koppeling in/exp. 
+    # koppeling in/exp.
   
     #defining times
     start_insp_time = [i / FS for i in start_insp]
@@ -130,19 +160,23 @@ def inspiration_detection_2(flow,rr):
     #defining start and end values
     start_insp_val = flow[start_insp]
     end_insp_val = flow[end_insp]
-
+    
+    print(np.where(start_insp ==val_start_remove))
     # # figures
     fig = plt.figure()
     ax1 = fig.add_subplot(2,1,1)
+    ax1.plot(time_sec, flow, 'k')
     start_insp_scat = ax1.scatter(start_insp_time, flow[start_insp], c='g')
     end_insp_scat  = ax1.scatter(end_insp_time,flow[end_insp], marker="x", c='y')
+    ax1.scatter(np.array(time_sec)[exp_peak],flow[exp_peak], c='y')
     # ax1.scatter(np.array(time_sec)[xpeak],flow[xpeak], c='b')
     ax2 = fig.add_subplot(2,1,2,sharex = ax1)
     ax2.plot(time_sec[0:-1],flow_diff)
     peak_scatter = ax1.scatter(np.asarray(time_sec)[idx_peak],flow[idx_peak], c='r')
     ax2.scatter(np.array(time_sec)[idx_peak],flow_diff[idx_peak], c='r')
     ax2.scatter(np.array(time_sec)[xpeak],flow_diff[xpeak], c='b')
-    ax1.plot(time_sec, flow, 'k')
+    ax2.scatter(np.array(time_sec)[exp_peak],flow_diff[exp_peak], c='y')
+ 
     ax1.legend((start_insp_scat,end_insp_scat, peak_scatter),
         ('Start inspiration', 'End inspiration', 'Start inspiration using peaks'), loc='upper right', shadow=True)
     ax1.set_title(r'Flow')
@@ -158,7 +192,7 @@ def inspiration_detection_2(flow,rr):
 
 
 if __name__ == '__main__':
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\3\Waves_003.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\4\Waves_004.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']

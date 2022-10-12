@@ -144,7 +144,7 @@ if __name__ == '__main__':
     5. respiratory rate is determined
     6. inspiration is determined based on hamilton"""
 
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\10\Waves_010.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']
