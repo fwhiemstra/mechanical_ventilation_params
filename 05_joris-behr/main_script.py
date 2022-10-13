@@ -67,6 +67,7 @@ from artefact_scoring import artefact_scoring
 from coughdetection import coughdetection
 from print_results import print_results
 from breaths_hamilton import breaths_hamilton
+from inspiration_detection_2 import inspiration_detection_2
 
 #%%
 "choises of skipping parts of the script"
@@ -83,7 +84,9 @@ exportCSV = 0
 graph = 0
 annotation = 0
 params = ['234', 2, 'test']
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
+insp_detection = 'script2'
+insp_comp = ''
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\3\Waves_003.txt'
 output_xlsx_file = []
 #
 
@@ -128,7 +131,7 @@ graphs_raw_data(p_es, p_air, volume, flow, FS)
 # Determine correct start time and segment length
 t_dur = math.floor(len(flow)/FS/60)
 print(f'The length of the signal is {t_dur}')
-determine_segment(params)
+determine_segment(params,t_dur)
 
 # Variable segment length
 if params[3] == '':
@@ -161,22 +164,25 @@ input_filename = PurePath(input_file).stem + PurePath(input_file).suffix
 rr = respiratory_rate_fft(volume_trim)
 
 #%%
-# Detecting the start- and end points of inspiration
-# [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
-#     volume_trim, p_es_trim, flow_trim, rr)
-
-start_insp, start_insp_values, end_insp, end_insp_values = inspiration_detection_2(flow_trim, rr)
-
-#%%
-
+# Detecting the start- and end points of inspiration using one of the created versions
+if insp_detection == 'script1':
+    [start_insp, start_insp_values, end_insp, end_insp_values] = inspiration_detection(
+         volume_trim, p_es_trim, flow_trim, rr)
+elif insp_detection == 'script2':
+    start_insp, start_insp_values, end_insp, end_insp_values = inspiration_detection_2(flow_trim, rr)
+elif insp_detection == 'hamilton':
 # Detecting the start- and endpoints of inspiration using the breath numbers from the hamilton device
-# start_insp_ham, end_insp_ham, start_insp_values_ham, end_insp_values_ham = breaths_hamilton(flow_trim,breath_no_trim, rr)
+    start_insp, end_insp, start_insp_values, end_insp_values = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
-# Calcuating the difference between hamilton and inspiration detection
-# ham_vs_script(start_insp,start_insp_ham,flow_trim)
+if insp_comp == 'script1':
+    [start_insp_2, start_insp_values_2, end_insp_2, end_insp_values_2] = inspiration_detection(
+         volume_trim, p_es_trim, flow_trim, rr)
+elif insp_comp == 'script2':
+    start_insp_2, start_insp_values2, end_insp_2, end_insp_values_2 = inspiration_detection_2(flow_trim, rr)
+elif insp_comp == 'hamilton':
+    start_insp_2, end_insp_2, start_insp_values_2, end_insp_values_2 = breaths_hamilton(flow_trim,breath_no_trim, rr)
 
-# start_insp = start_insp_ham.tolist()
-# end_insp = start_exp_ham.tolist()
+
 #%%
 # Calculating tidal volume
 [tidal_volume, mean_tidal_volume] = tidal_volume_calculator(end_insp, volume_trim)
@@ -261,9 +267,12 @@ graphs(
     p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
     segment_time_sec, pressure_type)
 
-#graphs_vs( 
-    # p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_ham, start_insp,start_insp_ham,
-    #        end_insp_values, start_insp_values, segment_time_sec, pressure_type)
+# Comparison between inspiration detection methods
+if insp_comp != "":
+    ham_vs_script(start_insp,start_insp_2,flow_trim,insp_detection,insp_comp)
+    graphs_vs( 
+    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_2, start_insp,start_insp_2,
+            end_insp_values, start_insp_values,segment_time_sec, pressure_type, insp_detection, insp_comp)
 
 # Show summary of the results
 # summary( 
