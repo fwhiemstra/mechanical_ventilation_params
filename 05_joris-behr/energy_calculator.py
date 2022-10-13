@@ -31,8 +31,6 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
 
             # Compensate for the calibration in volume --> define start inspiration where volume = 0
             if min(vol_interval) < 0:
-                print(vol_interval)
-                print(start)
                 ind = next(x[0] for x in enumerate(vol_interval) if x[1] >= 0)
                 vol_interval = vol_interval[ind:len(vol_interval)]
                 pres_interval = pres_interval[ind:len(pres_interval)]

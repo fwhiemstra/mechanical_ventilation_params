@@ -8,15 +8,19 @@ Date: February 2022
 import tkinter as tk
 
 
-def determine_segment(parameters):
+def determine_segment(parameters,t_dur):
 
     segment = tk.Tk()
     print('Specify length of segment and starting time of the segment')
     param = parameters
 
     def get_segment():
-        param.append(segment_length_entry.get())
-        param.append(segment_start_entry.get())
+        if len(segment_length_entry.get()) >0 and len(segment_start_entry.get()) >0:
+            param.append(segment_length_entry.get())
+            param.append(segment_start_entry.get())
+        else:
+            param.append(t_dur)
+            param.append(0)
         segment.destroy()
 
     # Create GUI
@@ -40,6 +44,10 @@ def determine_segment(parameters):
     submit_button = tk.Button(frame, text="OK", padx=10, pady=5,
                         fg="white", bg="#007cc2", command=get_segment)
     submit_button.pack()
+    run_full_button = tk.Button(frame, text="Run full", padx=10, pady=5,
+                        fg="white", bg="#007cc2", command=get_segment)
+    run_full_button.pack()
+
 
     # End tkinter module
     segment.mainloop()

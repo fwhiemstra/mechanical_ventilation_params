@@ -15,11 +15,11 @@ Date: October 2022
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from constants import FS, PRESSURE_TYPE, ADJ_HAM
+from constants import FS, PRESSURE_TYPE
 
 
-def graphs_vs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_ham, start_insp,start_insp_ham,
-           end_insp_values, start_insp_values, segment_time_sec, pressure_type):
+def graphs_vs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_2, start_insp,start_insp_2,
+           end_insp_values, start_insp_values, segment_time_sec, pressure_type, insp_detection, insp_comp):
 
     # grid plot
     fig = plt.figure()
@@ -60,16 +60,16 @@ def graphs_vs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp
         start_insp_values.remove(start_insp_values[-1])
     end_insp_time = [i / FS for i in end_insp]
     start_insp_time = [i / FS for i in start_insp]
-    start_insp_time_ham = [i / FS for i in start_insp_ham]
-    end_insp_time_ham = [i / FS for i in end_insp_ham]
+    start_insp_time_2 = [i / FS for i in start_insp_2]
+    end_insp_time_2 = [i / FS for i in end_insp_2]
 
     end_insp_scatter = ax2.scatter(end_insp_time, end_insp_values, c='r')
     start_insp_scatter = ax2.scatter(start_insp_time, start_insp_values, c='g')
-    start_insp_scatter_ham = ax2.scatter(start_insp_time_ham, np.array(flow_trim)[start_insp_ham], c='b')
-    end_insp_scatter_ham = ax2.scatter(end_insp_time_ham,np.array(flow_trim)[end_insp_ham], c='b', marker='x')
+    start_insp_scatter_2 = ax2.scatter(start_insp_time_2, np.array(flow_trim)[start_insp_2], c='b')
+    end_insp_scatter_2 = ax2.scatter(end_insp_time_2,np.array(flow_trim)[end_insp_2], c='b', marker='x')
     ax3.plot(segment_time_sec, p_air_trim, 'k')
-    ax5.legend((end_insp_scatter, start_insp_scatter, start_insp_scatter_ham, end_insp_scatter_ham),
-            ('End of inspiration', 'Start of inspiration', 'Start insp hamilton','End insp ham'), loc='upper right', shadow=True)
+    ax5.legend(( start_insp_scatter,end_insp_scatter, start_insp_scatter_2, end_insp_scatter_2),
+            ( f'Start insp {insp_detection}',f'End of inspiration {insp_detection}', f'Start insp {insp_comp}',f'End insp {insp_comp}'), loc='upper right', shadow=True)
     ax3.set_title(r'Airway pressure')
     ax3.set_ylabel(r'Pressure [cmH2O]')
     ax3.set_xlabel(r'Time [s]')

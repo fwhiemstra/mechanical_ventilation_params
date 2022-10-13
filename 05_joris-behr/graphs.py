@@ -55,6 +55,7 @@ def graphs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, s
 
     if len(start_insp_values) > len(start_insp):
         start_insp_values.remove(start_insp_values[-1])
+
     end_insp_time = [i / FS for i in end_insp]
     start_insp_time = [i / FS for i in start_insp]
 
