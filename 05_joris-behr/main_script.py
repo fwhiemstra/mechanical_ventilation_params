@@ -81,12 +81,12 @@ from inspiration_detection_2 import inspiration_detection_2
 # Settings
 artefactdetection = 1
 exportCSV = 0
-graph = 1
+graph = 0
 annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
 insp_comp = ''
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\8\Waves_008.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\2\Waves_002.txt'
 output_xlsx_file = []
 #
 

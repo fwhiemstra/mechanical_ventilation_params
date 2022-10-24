@@ -43,6 +43,7 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
                 ptp.append(ptp_single_breath)
         except:
             ptperror += 1
+            ptp_minute.append(NaN)
 
     # Calculate PTP/min per breath [cmH20.s/min]
     ptp_minute = []
@@ -53,6 +54,7 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
             ptp_minute.append(ptp_breath_minute)
         except:
             ptperror += 1
+            ptp_minute.append(NaN)
 
     print( "number of errors in ptp calculation is {}". format(ptperror))
     ptp_mean = round(np.mean(ptp_minute),2)  # Mean value of PTP over chosen segment

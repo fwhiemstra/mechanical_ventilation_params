@@ -115,6 +115,7 @@ def correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
                'tp peak':tp_peak[0:-1], 'tp swing': tp_swing[0:-1]}
     
     data = pd.DataFrame(data_dict)
+    data = data.dropna()
     matrix = data.corr(method = 'pearson').round(2)
 
     plt.figure()

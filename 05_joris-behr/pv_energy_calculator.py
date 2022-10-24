@@ -6,7 +6,7 @@ Date: February 2022
 
 """
 import numpy as np
-from numpy import mean
+from numpy import NaN, mean, nan
 from constants import CONV_FACTOR
 from intersect import intersection
 
@@ -59,10 +59,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 # Negative pressure values give erroneous results when integrating. Both the inspiratory
                 # and expiratory leg (entire hysteresis loop) should be shifted to positive.
                 if not pres_exp or not pres_insp:               # See if the list is empty
-                    pres_insp = [0,0]
-                    vol_insp = [0,0]
-                    pres_exp = [0,0]
-                    vol_exp = [0,0]
+                    pres_insp = [nan]
+                    vol_insp = [nan]
+                    pres_exp = [nan]
+                    vol_exp = [nan]
                 else:
                     if min(pres_exp) < 0 and min(pres_insp) < 0:
                         if min(pres_exp) <= min(pres_insp):
@@ -106,6 +106,7 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                                 i += 1
                         except:
                             pvenergyerror +=1
+                            pv_e_breath.append(NaN)
                             continue
             
                 if len(vol_150) > 0:
@@ -119,6 +120,7 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                         vol_exp = vol_exp[0:ind_exp]
                     except:
                         pvenergyerror +=1
+                        pv_e_breath.append(NaN)
 
                 # The direction of expiration is right to left, this must be reversed to
                 # obtain a positive value when integrating.
@@ -136,9 +138,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 pv_e_breath.append(integration)
         except:
             pvenergyerror +=1
+            pv_e_breath.append(NaN)
 
     # Remove empty values in list
-    pv_e_breath = [i for i in pv_e_breath if i != 0]
+    # pv_e_breath = [i for i in pv_e_breath if i != 0]
 
     # Calculate mean energy
     mean_pv_e_breath = round(mean(pv_e_breath), 2)

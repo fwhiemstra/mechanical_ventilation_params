@@ -11,7 +11,7 @@ Modified by Anne Meester
 Date: February 2022
 """
 import numpy as np
-from numpy import mean
+from numpy import NaN, mean
 import matplotlib.pyplot as plt
 
 from constants import CONV_FACTOR, FS
@@ -37,6 +37,7 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
                     pres_interval = pres_interval[ind:len(pres_interval)]
                 except:
                     energyerror += 1
+                    e_breath.append(NaN)
             else:
                 ind_insp = np.argmin(vol_interval)
                 vol_interval = vol_interval[ind_insp:len(vol_interval)]
@@ -71,6 +72,8 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
             p_breath.append(power)
         except: 
             energyerror += 1
+            p_breath.append(NaN)
+
             
     print("number of errors in energy calculation is {}". format(energyerror))
     # Calculate mean energy and power
