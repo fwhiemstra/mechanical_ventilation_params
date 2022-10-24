@@ -13,10 +13,13 @@ Modified by Anne Meester
 Date: February 2022
 """
 import math
+from turtle import shape
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from constants import PRESSURE_TYPE
-
 
 def sd_se_statistics(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
                wob_es_breath, wob_tp_breath, ptp_es, ptp_tp,
@@ -101,3 +104,25 @@ def sd_se_statistics(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
                        se_wob_tp_breath, se_wob_es_breath, se_ptp_es, se_ptp_tp, se_tp_peak, se_tp_swing]
 
     return standard_deviations, standard_errors
+
+def correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
+               wob_es_breath, wob_tp_breath, ptp_es, ptp_tp,
+               tp_peak, tp_swing):
+    #creating dataframe from data.
+    # Last values of TP peak and swing are not taken into account to ensure same length of data.
+    data_dict = {'Power breath': p_breath, 'Hys aw': aw_p_breath, 'Hys aw':es_p_breath, 'Hys tp':tp_p_breath,
+               'Power es':wob_es_breath, 'Power tp': wob_tp_breath, 'PTP es': ptp_es, 'PTP tp':ptp_tp,
+               'tp peak':tp_peak[0:-1], 'tp swing': tp_swing[0:-1]}
+    
+    data = pd.DataFrame(data_dict)
+    matrix = data.corr(method = 'pearson').round(2)
+
+    plt.figure()
+    sns.heatmap(matrix,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    plt.title("Heat map of correlations")
+    plt.show()
+
+    matrix = matrix.unstack()
+    matrix = matrix[abs(matrix) >= 0.7]
+    print(matrix)
+    return matrix

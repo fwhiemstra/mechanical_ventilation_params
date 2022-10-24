@@ -55,7 +55,7 @@ from ptp_calculator import ptp_calculator
 from tp_parameter_calculator import tp_parameter_calculator
 from energy_calculator import energy_calculator
 from pv_energy_calculator import pv_energy_calculator
-from sd_se_statistics import sd_se_statistics
+from statistics import sd_se_statistics, correlations
 from graphs import graphs
 from graphs_ham_vs_script import graphs_vs
 from summary import summary
@@ -66,7 +66,7 @@ from annotate_import import annotate_import
 from artefact_scoring import artefact_scoring
 from coughdetection import coughdetection
 from print_results import print_results
-from breaths_hamilton import breaths_hamilton
+from inspiration_hamilton import breaths_hamilton
 from inspiration_detection_2 import inspiration_detection_2
 
 #%%
@@ -81,12 +81,12 @@ from inspiration_detection_2 import inspiration_detection_2
 # Settings
 artefactdetection = 1
 exportCSV = 0
-graph = 0
+graph = 1
 annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
 insp_comp = ''
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\3\Waves_003.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\8\Waves_008.txt'
 output_xlsx_file = []
 #
 
@@ -127,7 +127,8 @@ if annotation == 1 and number_coughs != 0:
 #%%
 """ Determine the correct start time and segment length based on the graphs of the raw data without coughs"""
 # Graph of the raw data: p_es, p_air, volume and flow over time
-graphs_raw_data(p_es, p_air, volume, flow, FS)
+if graph ==1:
+    graphs_raw_data(p_es, p_air, volume, flow, FS)
 # Determine correct start time and segment length
 t_dur = math.floor(len(flow)/FS/60)
 print(f'The length of the signal is {t_dur}')
@@ -260,19 +261,28 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
                                                     p_es_breath, p_tp_breath, ptp_es, ptp_tp,
                                                     tp_peak, tp_swing, pressure_type)
 
+correlation = correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
+                                                    p_es_breath, p_tp_breath, ptp_es, ptp_tp,
+                                                    tp_peak, tp_swing)
+
 #%%
 """ Display of the results """
-# Show graphs
-graphs(
-    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
-    segment_time_sec, pressure_type)
-
-# Comparison between inspiration detection methods
+# Compare inspiration detection resulsts
 if insp_comp != "":
     ham_vs_script(start_insp,start_insp_2,flow_trim,insp_detection,insp_comp)
-    graphs_vs( 
-    p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_2, start_insp,start_insp_2,
-            end_insp_values, start_insp_values,segment_time_sec, pressure_type, insp_detection, insp_comp)
+    if graph == 1:
+        graphs_vs( 
+        p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_2, start_insp,start_insp_2,
+                end_insp_values, start_insp_values,segment_time_sec, pressure_type, insp_detection, insp_comp)
+# Show graphs
+if graph == 1:
+    graphs(
+        p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
+        segment_time_sec, pressure_type)
+
+    # Comparison between inspiration detection methods
+
+
 
 # Show summary of the results
 # summary( 
@@ -284,7 +294,7 @@ if insp_comp != "":
 output_option = params[1]  # 1 = use existing output file, 2 = create new output file
 new_output_name = params[2]  # name for new .xlsx file, if new-file-option is chosen
 
-[output_file, output_filename] = select_output_file(output_option, new_output_name, output_xlsx_file, input_filename,
-    patient_id, pressure_type, data_length, rr, mean_tidal_volume, air_power,
-    mean_peep, ptp_es_mean, ptp_tp_mean, p_es_mean, p_tp_mean, es_loop_power, aw_loop_power, tp_loop_power, tp_peak_mean,
-    tp_swing_mean, standard_deviations, standard_errors)
+# [output_file, output_filename] = select_output_file(output_option, new_output_name, output_xlsx_file, input_filename,
+#     patient_id, pressure_type, data_length, rr, mean_tidal_volume, air_power,
+#     mean_peep, ptp_es_mean, ptp_tp_mean, p_es_mean, p_tp_mean, es_loop_power, aw_loop_power, tp_loop_power, tp_peak_mean,
+#     tp_swing_mean, standard_deviations, standard_errors)

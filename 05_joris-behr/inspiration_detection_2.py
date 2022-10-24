@@ -83,16 +83,14 @@ def inspiration_detection_2(flow,rr):
         else:
         # if the value is within bounds, keep it.
             idx_peak[i] = idx 
-
     # Start of inspiration is defined as points:
     # 1. Where flow shifts neg/pos (not in idx_remove)
     # 2. Flow acceleration is not smaller than -10 ml/s^2
     # 3. Flow is >100 after 20 steps.
     # 4. that are at least seperation distance from previous
-    start_insp = np.asarray([v for i,v in enumerate(idx_peak[0:-1]) if (v not in idx_remove and flow_diff[v] >-10 and flow[v+20]>100 and diff(idx_peak)[i] >separation)])
-    
 
-
+    start_insp = np.asarray([v for i,v in enumerate(idx_peak[:-1]) if (v not in idx_remove and flow_diff[v] >-10 and (flow[v+20]>100 or flow[v+100]>100) and diff(idx_peak)[i] >separation)])
+    start_insp = np.append(start_insp,idx_peak[-1])
     # Finding end inspiration by using flow acceleration:
     # 1. Determining highest negative peak between two inspirations
     # 2. Finding nearest point where flow switches neg-pos(2a) or pos-neg(2b)
@@ -104,8 +102,8 @@ def inspiration_detection_2(flow,rr):
     for val1, val2 in zip(start_insp[0:-1], start_insp[1:]):
         # Step 1
         peak, _ = find_peaks(-flow_diff[val1:val2],distance=separation, height=100)
-        end_insp_peak.append(peak[0]+val1)
         if len(peak)>0:
+            end_insp_peak.append(peak[0]+val1)
             exp_peak_loc = peak[0]+val1 
 
             # Step 2a
@@ -116,6 +114,7 @@ def inspiration_detection_2(flow,rr):
                     end_insp.append(exp_peak_loc-new_peak[0]-1)
                 else:
                     val_start_remove.append(val1)
+                  
             # Step 2b
             elif flow[exp_peak_loc] >0:
                 new_peak = np.where((flow[exp_peak_loc:exp_peak_loc+10])<=0)[0]
@@ -127,7 +126,7 @@ def inspiration_detection_2(flow,rr):
                 end_insp.append(exp_peak_loc)
         else: 
             val_start_remove.append(val1)
-    
+   
     #Step 4
     start_insp = [v for v in start_insp if v not in val_start_remove]
 
@@ -168,7 +167,7 @@ def inspiration_detection_2(flow,rr):
 
 
 if __name__ == '__main__':
-    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\3\Waves_003.txt'
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
     [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
     length = len(p_air)
     params = ['234', 2, 'test']

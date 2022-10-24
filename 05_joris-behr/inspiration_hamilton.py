@@ -51,7 +51,7 @@ def breaths_hamilton(flow,breath_no,rr):
     # Remove values that are too close to eachother or arent followed by positive flow
     val_del = list()
     for idx,val in enumerate(start_insp_improved):
-        if (separation < start_insp_improved[idx] - start_insp_improved[idx-1]) and (flow[val+dist] > 100):
+        if (separation < start_insp_improved[idx] - start_insp_improved[idx-1]) and (flow[val+dist] > 100 or flow[val+100] >100):
             pass
         else:
             val_del.append(val)

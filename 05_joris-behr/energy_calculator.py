@@ -22,7 +22,7 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
     Returns e_breath, mean_e_breath, p_breath, mean_p_breath
 
     """
-
+    energyerror = 0
     e_breath = []
     for start, end in zip(start_insp, end_insp):
         if end > start:
@@ -31,9 +31,12 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
 
             # Compensate for the calibration in volume --> define start inspiration where volume = 0
             if min(vol_interval) < 0:
-                ind = next(x[0] for x in enumerate(vol_interval) if x[1] >= 0)
-                vol_interval = vol_interval[ind:len(vol_interval)]
-                pres_interval = pres_interval[ind:len(pres_interval)]
+                try:
+                    ind = next(x[0] for x in enumerate(vol_interval) if x[1] >= 0)
+                    vol_interval = vol_interval[ind:len(vol_interval)]
+                    pres_interval = pres_interval[ind:len(pres_interval)]
+                except:
+                    energyerror += 1
             else:
                 ind_insp = np.argmin(vol_interval)
                 vol_interval = vol_interval[ind_insp:len(vol_interval)]
@@ -61,15 +64,14 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
     
     # Calculate power per breath [J/min]
     p_breath = []
-    energyerror = 0
     for i in range(len(start_insp)-1):
         dur_min = (start_insp[i+1]-start_insp[i])/FS/60   # Duration of breath
         try:
             power = e_breath[i] / dur_min        # Power of breath
+            p_breath.append(power)
         except: 
             energyerror += 1
             
-    p_breath.append(power)
     print("number of errors in energy calculation is {}". format(energyerror))
     # Calculate mean energy and power
     mean_e_breath = round(mean(e_breath),2)
