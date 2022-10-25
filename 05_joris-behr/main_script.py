@@ -55,7 +55,7 @@ from ptp_calculator import ptp_calculator
 from tp_parameter_calculator import tp_parameter_calculator
 from energy_calculator import energy_calculator
 from pv_energy_calculator import pv_energy_calculator
-from statistics import sd_se_statistics, correlations
+from statistics_calculator import sd_se_statistics, correlations
 from graphs import graphs
 from graphs_ham_vs_script import graphs_vs
 from summary import summary
@@ -85,7 +85,7 @@ graph = 0
 annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
-insp_comp = ''
+insp_comp = 'script1'
 input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\2\Waves_002.txt'
 output_xlsx_file = []
 #

@@ -4,9 +4,10 @@ Autor: Joris Behr
 Date: October 2022
 
 """
-from tracemalloc import start
+
 import numpy as np
 import statistics as st
+
 
 def ham_vs_script(start_insp,start_insp_2,flow,insp_detection,insp_comp):
     try:

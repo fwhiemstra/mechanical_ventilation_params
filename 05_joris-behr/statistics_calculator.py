@@ -117,13 +117,19 @@ def correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
     data = pd.DataFrame(data_dict)
     data = data.dropna()
     matrix = data.corr(method = 'pearson').round(2)
+    mask = np.triu(np.ones_like(matrix, dtype=bool))
 
     plt.figure()
-    sns.heatmap(matrix,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    sns.heatmap(matrix,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag', mask=mask)
     plt.title("Heat map of correlations")
+    #Saving the heatmap
+    # plt.savefig('heatmap001.jpg')
+    plt.tight_layout()
     plt.show()
 
     matrix = matrix.unstack()
     matrix = matrix[abs(matrix) >= 0.7]
     print(matrix)
+
+  
     return matrix

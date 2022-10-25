@@ -56,13 +56,13 @@ def inspiration_detection_2(flow,rr):
             if idx - 400 <0:
                 id_0 = np.where(np.diff(np.sign(flow[0:idx])))[0]
                 try:
-                    idx_peak[i] = id_0[-1]
+                    idx_peak[i] = id_0[-1]+1     # +1 since otherwise the negative value is used
                 except:
                     idx_remove.append(idx) # if no flip is found, value should be removed
             else:
                 id_0 = np.where(np.diff(np.sign(flow[idx-400:idx])))[0]
                 try:
-                    idx_peak[i] = id_0[-1]+idx-400
+                    idx_peak[i] = id_0[-1]+idx-400+1
                 except:
                     idx_remove.append(idx) # if no flip is found, value should be removed
         elif flow[idx]<-40:
@@ -70,15 +70,14 @@ def inspiration_detection_2(flow,rr):
             if idx + 400 >len(flow):
                 id_0 = np.where(np.diff(np.sign(flow[idx:-1])))[0]
                 try:
-                    idx_peak[i] = id_0[0]
+                    idx_peak[i] = id_0[0]+1
                 except:
                     idx_remove.append(idx) # if no flip is found, value should be removed
             else:
                 id_0 = np.where(np.diff(np.sign(flow[idx:idx+200])))[0]
                 try:
-                    idx_peak[i] = id_0[0]+idx
-                except:
-                    
+                    idx_peak[i] = id_0[0]+idx+1   
+                except: 
                     idx_remove.append(idx) # if no flip is found, value should be removed
         else:
         # if the value is within bounds, keep it.
@@ -86,16 +85,16 @@ def inspiration_detection_2(flow,rr):
     # Start of inspiration is defined as points:
     # 1. Where flow shifts neg/pos (not in idx_remove)
     # 2. Flow acceleration is not smaller than -10 ml/s^2
-    # 3. Flow is >100 after 20 steps.
+    # 3. Absolulte flow is less than 100ml/s
     # 4. that are at least seperation distance from previous
-
-    start_insp = np.asarray([v for i,v in enumerate(idx_peak[:-1]) if (v not in idx_remove and flow_diff[v] >-10 and (flow[v+20]>100 or flow[v+100]>100) and diff(idx_peak)[i] >separation)])
+    start_insp = np.asarray([v for i,v in enumerate(idx_peak[:-1]) if (v not in idx_remove and (abs(flow[v]) <100) and flow_diff[v] >-10 and diff(idx_peak)[i] >separation)]) # (flow[v+20]>100 or flow[v+100]>100) and 
     start_insp = np.append(start_insp,idx_peak[-1])
+
     # Finding end inspiration by using flow acceleration:
     # 1. Determining highest negative peak between two inspirations
     # 2. Finding nearest point where flow switches neg-pos(2a) or pos-neg(2b)
     # 3. Set end inspiration at last positive value before switch
-    # 4. Remove start insp values that can't meet requirement of step 2.
+    # 4. Remove start insp values that can't meet requirement of step 2.x
     end_insp = list()
     end_insp_peak = list()
     val_start_remove = list()
@@ -126,6 +125,7 @@ def inspiration_detection_2(flow,rr):
                 end_insp.append(exp_peak_loc)
         else: 
             val_start_remove.append(val1)
+            
    
     #Step 4
     start_insp = [v for v in start_insp if v not in val_start_remove]
@@ -162,7 +162,7 @@ def inspiration_detection_2(flow,rr):
     #defining start and end values
     start_insp_val = flow[start_insp]
     end_insp_val = flow[end_insp]
-
+   
     return start_insp, start_insp_val, end_insp, end_insp_val
 
 
