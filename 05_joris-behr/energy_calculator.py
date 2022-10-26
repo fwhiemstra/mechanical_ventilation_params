@@ -62,7 +62,7 @@ def energy_calculator(name, start_insp, end_insp, pressure, volume_trim):
             # Integrate to calculate energy per breath and convert from [mL*cmH2O] to [J]
             integration = CONV_FACTOR * np.trapz(pres_interval, vol_interval)
             e_breath.append(abs(integration))
-    
+     
     # Calculate power per breath [J/min]
     p_breath = []
     for i in range(len(start_insp)-1):

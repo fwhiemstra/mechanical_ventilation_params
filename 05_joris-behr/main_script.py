@@ -86,7 +86,7 @@ annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
 insp_comp = 'script1'
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\2\Waves_002.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
 output_xlsx_file = []
 #
 
