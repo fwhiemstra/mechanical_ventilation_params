@@ -5,10 +5,12 @@ Author: Anne Meester
 Date: February 2022
 
 """
+from turtle import shape
 import numpy as np
 from numpy import NaN, mean, nan
-from constants import CONV_FACTOR
+from constants import CONV_FACTOR,FS
 from intersect import intersection
+import statistics as st
 
 
 def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
@@ -19,7 +21,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
     pv_insp_breath = []
     pv_exp_breath = []
     pv_e_breath = []
+    pv_p_breath = []
+    dur_min = []
     pvenergyerror =0
+    hysteresis_error = 0
 
 
     # For all breaths determine the pressures and volumes during inspiration and expiration.
@@ -136,15 +141,19 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 pv_insp_breath.append(integration_insp)
                 pv_exp_breath.append(integration_exp)
                 pv_e_breath.append(integration)
+                dur_min.append((end_exp - start_insp)/FS/60)
         except:
             pvenergyerror +=1
             pv_e_breath.append(NaN)
 
-    # Remove empty values in list
-    # pv_e_breath = [i for i in pv_e_breath if i != 0]
+
+    pv_p_breath = [i/j for i,j in zip(pv_e_breath, dur_min)]
+    mean_pv_p_breath = mean(pv_p_breath)
 
     # Calculate mean energy
     mean_pv_e_breath = round(mean(pv_e_breath), 2)
+    
     print("number of errors in pv energy calculation is {}". format(pvenergyerror))
+    print("number of errors in pv power calculation is {}". format(hysteresis_error))
 
-    return pv_e_breath, mean_pv_e_breath
+    return pv_e_breath, mean_pv_e_breath, pv_p_breath, mean_pv_p_breath

@@ -133,3 +133,113 @@ def correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
 
   
     return matrix
+
+
+def correlations_xlsx(input):
+    """Function to analyze data from excel file
+    Shows histrogram, bar plots and correlation heatmaps"""
+    
+    # Selecting columns that contain data
+    data = pd.read_excel(input, usecols='B:N')
+    
+    # Filtering data based on measuring location
+    
+    data_aw = data[["e_aw", "pow_aw", "hys_aw"]]
+    data_es = data[["e_es", "pow_es", "hys_es", "ptp_es"]]
+    data_tp= data[["e_tp", "pow_tp", "hys_tp", "ptp_tp", "tp_peak", "tp_swing"]]
+    
+    ## Uncomment data below to create own filtered data
+    # data_fil = data[["heading1", "heading2", "heading3"]]
+    
+    
+    ## Creating correlation matrices, spearman is used since data is not normally distributed
+    matrix_tot = data.corr(method = 'spearman').round(2)
+    mask_tot = np.triu(np.ones_like(matrix_tot, dtype=bool))
+    
+    matrix_aw = data_aw.corr(method = 'spearman').round(2)
+    mask_aw = np.triu(np.ones_like(matrix_aw, dtype=bool))
+
+    matrix_es = data_es.corr(method = 'spearman').round(2)
+    mask_es = np.triu(np.ones_like(matrix_es, dtype=bool))
+
+    matrix_tp = data_tp.corr(method = 'spearman').round(2)
+    mask_tp = np.triu(np.ones_like(matrix_tp, dtype=bool))
+
+    ## Uncomment code below to create matrix of own filtered data
+    # matrix_fil = data_fil.corr(method = 'spearman').round(2)
+    # mask_fil = np.triu(np.ones_like(matrix_fil, dtype=bool)) 
+    
+    ## Filter values based on correlation value
+    # matrix_tot_fil = matrix_tot.unstack()
+    # matrix_tot_fil = matrix_tot_fil[abs(matrix_tot_fil) >= 0.7]
+    # print(matrix_tot_fil)   
+
+
+    ## Creating figures
+    # pairplots
+    pp_aw = sns.pairplot(data_aw)
+    pp_aw.fig.suptitle("Scatterplot matrix of airway parameters")
+    plt.tight_layout()
+    plt.savefig('pairplot_aw.jpg')
+
+
+    pp_es = sns.pairplot(data_es)
+    pp_es.fig.suptitle("Scatterplot matrix of esophageal parameters")
+    plt.tight_layout()
+    plt.savefig('pairplot_es.jpg')
+
+    pp_tp = sns.pairplot(data_tp)
+    pp_tp.fig.suptitle("Scatterplot matrix of transpulmonal parameters")
+    plt.tight_layout()
+    plt.savefig('pairplot_tp.jpg')
+
+    ## Uncomment lines below to plot own filtered data
+    # pp_fil = sns.pairplot(data_fil)
+    # pp_fil.fig.suptitle("Scatterplot matrix of filtered parameters")
+    # plt.tight_layout()
+
+    plt.show()
+
+    # Correlation heatmaps
+    # To show only half of the heat map, add mask = mask_{name of data}. ie for total: mask=mask_tot
+    plt.figure()
+    sns.heatmap(matrix_tot,annot = True, vmax = 1, vmin = -1, center = 0, cmap = 'vlag')
+    plt.title("Heat map of correlations")
+    plt.tight_layout()
+    plt.savefig('heatmap_tot.jpg')
+
+    plt.figure()
+    sns.heatmap(matrix_aw,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    plt.title("Heat map of airway parameter correlations")
+    plt.tight_layout()
+    plt.savefig('heatmap_aw.jpg')
+
+    plt.figure()
+    sns.heatmap(matrix_es,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    plt.title("Heat map of esophageal parameter correlations")
+    plt.tight_layout()
+    plt.savefig('heatmap_es.jpg')
+
+    plt.figure()
+    sns.heatmap(matrix_tp,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    plt.title("Heat map of transpulmonal parameter correlations")
+    plt.tight_layout()
+    plt.savefig('heatmap_tp.jpg')
+
+    ## Uncomment code below to create own filtered heatmap
+    # plt.figure()
+    # sns.heatmap(matrix_fil,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
+    # plt.title("Heat map of transpulmonal parameter correlations")
+    # plt.tight_layout()
+
+    plt.show()
+
+
+
+
+
+if __name__ == '__main__':
+    """Run excel code seperately from main.py by running "python statistics_calculator.py" 
+    Make sure to select correct input data directory for the data"""
+    input = r"C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\params\param_tot.xlsx"
+    correlations_xlsx(input)

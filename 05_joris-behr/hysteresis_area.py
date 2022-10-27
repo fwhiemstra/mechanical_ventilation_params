@@ -30,5 +30,6 @@ def hysteresis_area(start, pv_e_breath):
             hysteresis_error += 1
             pv_p_breath.append(NaN)
     mean_pv_p_breath = round(mean(pv_p_breath), 2)
+    print(mean(pv_p_breath))
     print("number of errors in hysteresis is {}". format(hysteresis_error))
     return pv_p_breath, mean_pv_p_breath

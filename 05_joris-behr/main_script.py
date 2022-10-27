@@ -68,15 +68,20 @@ from coughdetection import coughdetection
 from print_results import print_results
 from inspiration_hamilton import breaths_hamilton
 from inspiration_detection_2 import inspiration_detection_2
+from export_params import export_params
 
 #%%
 "choises of skipping parts of the script"
 # Next to calculating the mechanical power this script is capable of 
-# cough detection and filtering, calculating the sensitivity of artefact detection when given an annotated script from trainset.nl
-# and creating a csv file that can be uploaded on trainset.nl to annotate the data
-# lastly graphs can be put on and of. 
+# 1. cough detection and filtering, 
+# 2. calculating the sensitivity of artefact detection when given an annotated script from trainset.nl
+# 3. creating a csv file that can be uploaded on trainset.nl to annotate the data
+# 4. graphs can be put on and off.
 # 0 = off
 # 1 = on
+# 5. Different inspiration detection algoritms can be compared: 
+# Select script2, script1 or hamilton
+
 
 # Settings
 artefactdetection = 1
@@ -85,8 +90,8 @@ graph = 0
 annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
-insp_comp = 'script1'
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
+insp_comp = ''
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\9\Waves_009.txt'
 output_xlsx_file = []
 #
 
@@ -192,17 +197,18 @@ elif insp_comp == 'hamilton':
 [peep, mean_peep] = peep_calculator(start_insp, p_air_trim)
 #%%
 """ Calculate the energy of the airway pressures (Pair) using the energy calculator """
-[e_breath, mean_e_breath, p_breath, air_power] = energy_calculator(
+[e_aw, e_aw_mean, pow_aw, pow_air_mean] = energy_calculator(
     'p_air', start_insp, end_insp, p_air_trim, volume_trim)
 #%%
 """ Plot the three PV loops in one figure """
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex = 'all', sharey = 'all')
 fig.suptitle('Pressure volume loops')
 #%%
-""" Define the PV-loops and calculate the Hysteresis Area (HA) for the airway pressure """
+""" Define the PV-loops and calculate the dynamic energy and power for the airway pressure """
 # Calculate Hysteresis Area (HA)
-[aw_e_breath, mean_aw_e_breath] = pv_energy_calculator(start_insp, end_insp, p_air_trim, volume_trim, 'Airway pressure', ax1)
-[aw_p_breath, aw_loop_power] = hysteresis_area(start_insp, aw_e_breath)
+[e_dyn_aw, e_dyn_aw_mean,pow_dyn_aw, pow_dyn_aw_mean] = pv_energy_calculator(start_insp, end_insp, p_air_trim, volume_trim, 'Airway pressure', ax1)
+
+
 #%%
 """ Calculations for transpulmonary pressure if Pes is not zero (Ptransp = Paw-Pes) """
 if pressure_type == PRESSURE_TYPE.TRANSPULMONARY:
@@ -214,20 +220,19 @@ if pressure_type == PRESSURE_TYPE.TRANSPULMONARY:
 
     """ Calculate dynamic energy using the energy calculator """
     # Calculate transpulmonary work and power
-    [tp_e_breath, tp_mean_e_breath, p_tp_breath, p_tp_mean] = energy_calculator(
+    [e_tp, e_tp_mean, pow_tp, pow_tp_mean] = energy_calculator(
     'p_tp', start_insp, end_insp, p_tp_trim, volume_trim)
+    
     # Calculate esophageal work and power
-    [es_e_breath, es_mean_e_breath, p_es_breath, p_es_mean] = energy_calculator(
+    [e_es, e_es_mean, pow_es, pow_es_mean] = energy_calculator(
     'p_es', start_insp, end_insp, p_es_trim, volume_trim)
 
     """ Calculate the hysteresis using the pv energy calculator"""
-    [tp_e_breath, mean_tp_e_breath] = pv_energy_calculator(
+    [e_dyn_tp, e_dyn_tp_mean,pow_dyn_tp, pow_dyn_tp_mean] = pv_energy_calculator(
         start_insp, end_insp, p_tp_trim, volume_trim, 'Transpulmonary pressure', ax3)
-    [tp_p_breath, tp_loop_power] = hysteresis_area(start_insp, tp_e_breath)
 
-    [es_e_breath, mean_es_e_breath] = pv_energy_calculator(
+    [e_dyn_es, e_dyn_es_mean,pow_dyn_es, es_loop_power] = pv_energy_calculator(
         start_insp, end_insp, p_es_trim, volume_trim, 'Esophageal pressure', ax2)
-    [es_p_breath, es_loop_power] = hysteresis_area(start_insp, es_e_breath)
 
     """ Calculate pressure time product (PTP) """
     [ptp_es, ptp_es_mean] = ptp_calculator('p_es', p_es_trim, start_insp, end_insp)
@@ -244,8 +249,8 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
     wob_tp_mean = None
     wob_es_breath = None
     wob_es_mean = None
-    tp_p_breath = None
-    tp_loop_power = None
+    pow_dyn_tp = None
+    pow_dyn_tp_mean = None
     ptp_es = None
     ptp_es_mean = None
     ptp_tp = None
@@ -257,13 +262,13 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 
 #%%
 """ Statistics """
-[standard_deviations, standard_errors] = sd_se_statistics(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
-                                                    p_es_breath, p_tp_breath, ptp_es, ptp_tp,
+[standard_deviations, standard_errors] = sd_se_statistics(pow_aw, pow_dyn_aw, pow_dyn_es, pow_dyn_tp,
+                                                    pow_es, pow_tp, ptp_es, ptp_tp,
                                                     tp_peak, tp_swing, pressure_type)
 
-correlation = correlations(p_breath, aw_p_breath, es_p_breath, tp_p_breath,
-                                                    p_es_breath, p_tp_breath, ptp_es, ptp_tp,
-                                                    tp_peak, tp_swing)
+# correlation = correlations(pow_aw, pow_dyn_aw, pow_dyn_es, pow_dyn_tp,
+#                                                     pow_es, pow_tp, ptp_es, ptp_tp,
+#                                                     tp_peak, tp_swing)
 
 #%%
 """ Display of the results """
@@ -282,12 +287,14 @@ if graph == 1:
 
     # Comparison between inspiration detection methods
 
+# Create csv from parameter values
+# export_params(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp, pow_dyn_aw, pow_dyn_es, pow_dyn_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
 
 
 # Show summary of the results
 # summary( 
 #     patient_id, pressure_type, rr, mean_tidal_volume, mean_peep,
-#     air_power, p_tp_mean, p_es_mean, aw_loop_power, tp_loop_power, ptp_es_mean,
+#     pow_air_mean, pow_tp_mean, pow_es_mean, pow_dyn_aw_mean, pow_dyn_tp_mean, ptp_es_mean,
 #     ptp_tp_mean, tp_peak_mean, tp_swing_mean)
 
 # Export results to output file
@@ -295,6 +302,6 @@ output_option = params[1]  # 1 = use existing output file, 2 = create new output
 new_output_name = params[2]  # name for new .xlsx file, if new-file-option is chosen
 
 # [output_file, output_filename] = select_output_file(output_option, new_output_name, output_xlsx_file, input_filename,
-#     patient_id, pressure_type, data_length, rr, mean_tidal_volume, air_power,
-#     mean_peep, ptp_es_mean, ptp_tp_mean, p_es_mean, p_tp_mean, es_loop_power, aw_loop_power, tp_loop_power, tp_peak_mean,
+#     patient_id, pressure_type, data_length, rr, mean_tidal_volume, pow_air_mean,
+#     mean_peep, ptp_es_mean, ptp_tp_mean, pow_es_mean, pow_tp_mean, es_loop_power, pow_dyn_aw_mean, pow_dyn_tp_mean, tp_peak_mean,
 #     tp_swing_mean, standard_deviations, standard_errors)
