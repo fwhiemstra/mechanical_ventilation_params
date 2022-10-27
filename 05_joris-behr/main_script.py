@@ -68,7 +68,8 @@ from coughdetection import coughdetection
 from print_results import print_results
 from inspiration_hamilton import breaths_hamilton
 from inspiration_detection_2 import inspiration_detection_2
-from export_params import export_params
+from export_params import export_params, param_to_df
+from pes_pcw_correction import pes_pcw_correction
 
 #%%
 "choises of skipping parts of the script"
@@ -116,6 +117,9 @@ patient_id = params[0]
 if exportCSV ==1:
     export_csv(p_es, p_air, volume, flow, FS, length, patient_id, t_dur)
 
+p_es,pcw = pes_pcw_correction(p_es)
+print(pcw)
+
 """Artefact detection"""
 # detects coughs, filters the coughs and returns a list with cough parameters
 if artefactdetection == 1:
@@ -136,10 +140,16 @@ if graph ==1:
     graphs_raw_data(p_es, p_air, volume, flow, FS)
 # Determine correct start time and segment length
 t_dur = math.floor(len(flow)/FS/60)
-print(f'The length of the signal is {t_dur}')
-determine_segment(params,t_dur)
 
-# Variable segment length
+# print(f'The length of the signal is {t_dur}')
+# determine_segment(params,t_dur)
+
+# Code to run full script.
+params.append(t_dur)
+params.append(0)
+
+
+# # Variable segment length
 if params[3] == '':
     segment_len = 0  # No segment length is defined
 else:
@@ -161,7 +171,7 @@ input_filename = PurePath(input_file).stem + PurePath(input_file).suffix
 
 #%%
 """ General code """
-# Cut recording based on specified segment length and start time
+# # Cut recording based on specified segment length and start time
 [volume_trim, flow_trim, p_air_trim, p_es_trim,breath_no_trim, segment_time_sec, data_length] = trim_recording(
     rec_delay, FS, p_es, segment_len, volume, flow, p_air,breath_no, length)
 
@@ -206,7 +216,7 @@ fig.suptitle('Pressure volume loops')
 #%%
 """ Define the PV-loops and calculate the dynamic energy and power for the airway pressure """
 # Calculate Hysteresis Area (HA)
-[e_dyn_aw, e_dyn_aw_mean,pow_dyn_aw, pow_dyn_aw_mean] = pv_energy_calculator(start_insp, end_insp, p_air_trim, volume_trim, 'Airway pressure', ax1)
+[e_hys_aw, e_hys_aw_mean,hys_aw, hys_aw_mean] = pv_energy_calculator(start_insp, end_insp, p_air_trim, volume_trim, 'Airway pressure', ax1)
 
 
 #%%
@@ -228,10 +238,10 @@ if pressure_type == PRESSURE_TYPE.TRANSPULMONARY:
     'p_es', start_insp, end_insp, p_es_trim, volume_trim)
 
     """ Calculate the hysteresis using the pv energy calculator"""
-    [e_dyn_tp, e_dyn_tp_mean,pow_dyn_tp, pow_dyn_tp_mean] = pv_energy_calculator(
+    [e_hys_tp, e_hys_tp_mean,hys_tp, hys_tp_mean] = pv_energy_calculator(
         start_insp, end_insp, p_tp_trim, volume_trim, 'Transpulmonary pressure', ax3)
 
-    [e_dyn_es, e_dyn_es_mean,pow_dyn_es, es_loop_power] = pv_energy_calculator(
+    [e_hys_es, e_hys_es_mean,hys_es, es_loop_power] = pv_energy_calculator(
         start_insp, end_insp, p_es_trim, volume_trim, 'Esophageal pressure', ax2)
 
     """ Calculate pressure time product (PTP) """
@@ -249,8 +259,8 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
     wob_tp_mean = None
     wob_es_breath = None
     wob_es_mean = None
-    pow_dyn_tp = None
-    pow_dyn_tp_mean = None
+    hys_tp = None
+    hys_tp_mean = None
     ptp_es = None
     ptp_es_mean = None
     ptp_tp = None
@@ -262,11 +272,11 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 
 #%%
 """ Statistics """
-[standard_deviations, standard_errors] = sd_se_statistics(pow_aw, pow_dyn_aw, pow_dyn_es, pow_dyn_tp,
+[standard_deviations, standard_errors] = sd_se_statistics(pow_aw, hys_aw, hys_es, hys_tp,
                                                     pow_es, pow_tp, ptp_es, ptp_tp,
                                                     tp_peak, tp_swing, pressure_type)
 
-# correlation = correlations(pow_aw, pow_dyn_aw, pow_dyn_es, pow_dyn_tp,
+# correlation = correlations(pow_aw, hys_aw, hys_es, hys_tp,
 #                                                     pow_es, pow_tp, ptp_es, ptp_tp,
 #                                                     tp_peak, tp_swing)
 
@@ -285,17 +295,18 @@ if graph == 1:
         p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values, start_insp_values,
         segment_time_sec, pressure_type)
 
-    # Comparison between inspiration detection methods
-
-# Create csv from parameter values
-# export_params(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp, pow_dyn_aw, pow_dyn_es, pow_dyn_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
-
-
 # Show summary of the results
 # summary( 
 #     patient_id, pressure_type, rr, mean_tidal_volume, mean_peep,
-#     pow_air_mean, pow_tp_mean, pow_es_mean, pow_dyn_aw_mean, pow_dyn_tp_mean, ptp_es_mean,
+#     pow_air_mean, pow_tp_mean, pow_es_mean, hys_aw_mean, hys_tp_mean, ptp_es_mean,
 #     ptp_tp_mean, tp_peak_mean, tp_swing_mean)
+
+
+# transform parameters to one single dataframe
+param = param_to_df(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp,e_hys_aw, e_hys_es, e_hys_tp, hys_aw, hys_es, hys_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
+
+# Create excel file from parameter values
+# export_params(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp,e_hys_aw, e_hys_es, e_hys_tp, hys_aw, hys_es, hys_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
 
 # Export results to output file
 output_option = params[1]  # 1 = use existing output file, 2 = create new output file
@@ -303,5 +314,5 @@ new_output_name = params[2]  # name for new .xlsx file, if new-file-option is ch
 
 # [output_file, output_filename] = select_output_file(output_option, new_output_name, output_xlsx_file, input_filename,
 #     patient_id, pressure_type, data_length, rr, mean_tidal_volume, pow_air_mean,
-#     mean_peep, ptp_es_mean, ptp_tp_mean, pow_es_mean, pow_tp_mean, es_loop_power, pow_dyn_aw_mean, pow_dyn_tp_mean, tp_peak_mean,
+#     mean_peep, ptp_es_mean, ptp_tp_mean, pow_es_mean, pow_tp_mean, es_loop_power, hys_aw_mean, hys_tp_mean, tp_peak_mean,
 #     tp_swing_mean, standard_deviations, standard_errors)
