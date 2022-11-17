@@ -9,6 +9,7 @@ Date: February 2022
 """
 
 import numpy as np
+from numpy import NaN
 from constants import FS
 
 
@@ -26,7 +27,6 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
     for start, end in zip(start_insp, end_insp):
         try:
             p_single_breath = pressure[start:end]  # Take pressure values per inspiration
-
             # Translate the curve such that the maximum pressure of P_es equals zero and the minimum pressure of P_aw and P_tp equals zero
             if name == 'p_es':
                 max_p_single_breath = max(p_single_breath)
@@ -54,6 +54,7 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
             ptp_minute.append(ptp_breath_minute)
         except:
             ptperror += 1
+            ptp_minute.append(NaN)
 
     print( "number of errors in ptp calculation is {}". format(ptperror))
     ptp_mean = round(np.mean(ptp_minute),2)  # Mean value of PTP over chosen segment

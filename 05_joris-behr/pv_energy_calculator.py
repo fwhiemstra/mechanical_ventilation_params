@@ -5,14 +5,16 @@ Author: Anne Meester
 Date: February 2022
 
 """
+from turtle import shape
 import numpy as np
-from numpy import mean
-import matplotlib.pyplot as plt
-from constants import CONV_FACTOR, FS
+from numpy import NaN, mean, nan
+from constants import CONV_FACTOR,FS
 from intersect import intersection
+import statistics as st
 
 
-def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
+
+def pv_energy_calculator(start, end, pressure, volume, plot_name,ax):
     """
     Returns pv_e_breath, mean_pv_e_breath, pv_p_breath, mean_pv_p_breath
     """
@@ -20,7 +22,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
     pv_insp_breath = []
     pv_exp_breath = []
     pv_e_breath = []
+    pv_p_breath = []
+    dur_min = []
     pvenergyerror =0
+    hysteresis_error = 0
 
 
     # For all breaths determine the pressures and volumes during inspiration and expiration.
@@ -51,7 +56,8 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                     vol_exp = vol_exp_org[0:ind_exp]
                     pres_exp = pres_exp_org[0:ind_exp]
 
-                # Plot the PV loops:
+                # # Plot the PV loops:
+                # """NOTE comment when using main_loop.py"""
                 ax.plot(pres_insp, vol_insp, color = 'lawngreen')
                 ax.plot(pres_exp, vol_exp, color = 'orange')
                 ax.set_title(plot_name)
@@ -60,10 +66,10 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 # Negative pressure values give erroneous results when integrating. Both the inspiratory
                 # and expiratory leg (entire hysteresis loop) should be shifted to positive.
                 if not pres_exp or not pres_insp:               # See if the list is empty
-                    pres_insp = [0,0]
-                    vol_insp = [0,0]
-                    pres_exp = [0,0]
-                    vol_exp = [0,0]
+                    pres_insp = [nan]
+                    vol_insp = [nan]
+                    pres_exp = [nan]
+                    vol_exp = [nan]
                 else:
                     if min(pres_exp) < 0 and min(pres_insp) < 0:
                         if min(pres_exp) <= min(pres_insp):
@@ -90,7 +96,7 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 # First, the intersection between the inspiratory leg and the expiratory leg must be determined
                 intersect_pres, intersect_vol = intersection(pres_insp, vol_insp, pres_exp, vol_exp)
 
-                # If the intersection is between volume 0-100 mL, this becomes the minimum point of the HA
+                # If the intersection is between volume 0-150 mL, this becomes the minimum point of the HA
                 vol_150 = []
                 pres_150 = []
                 ind_150 = []
@@ -107,12 +113,12 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                                 i += 1
                         except:
                             pvenergyerror +=1
+                            pv_e_breath.append(NaN)
                             continue
+            
                 if len(vol_150) > 0:
                     try:
-                        intrs_vol = max(vol_150)
-                        intrs_ind = vol_150.index(intrs_vol)
-                        intrs_pres = pres_150[intrs_ind]
+                        intrs_vol = max(vol_150)        
                         ind_insp = next(x[0] for x in enumerate(vol_insp) if x[1] >= intrs_vol)
                         ind_exp = next(x[0] for x in enumerate(vol_exp) if x[1] <= intrs_vol)
                         pres_insp = pres_insp[ind_insp:len(pres_insp)]
@@ -121,6 +127,7 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                         vol_exp = vol_exp[0:ind_exp]
                     except:
                         pvenergyerror +=1
+                        pv_e_breath.append(NaN)
 
                 # The direction of expiration is right to left, this must be reversed to
                 # obtain a positive value when integrating.
@@ -136,14 +143,19 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                 pv_insp_breath.append(integration_insp)
                 pv_exp_breath.append(integration_exp)
                 pv_e_breath.append(integration)
+                dur_min.append((end_exp - start_insp)/FS/60)
         except:
             pvenergyerror +=1
+            pv_e_breath.append(NaN)
 
-    # Remove empty values in list
-    pv_e_breath = [i for i in pv_e_breath if i != 0]
+
+    pv_p_breath = [i/j for i,j in zip(pv_e_breath, dur_min)]
+    mean_pv_p_breath = mean(pv_p_breath)
 
     # Calculate mean energy
     mean_pv_e_breath = round(mean(pv_e_breath), 2)
+    
     print("number of errors in pv energy calculation is {}". format(pvenergyerror))
+    print("number of errors in pv power calculation is {}". format(hysteresis_error))
 
-    return pv_e_breath, mean_pv_e_breath
+    return pv_e_breath, mean_pv_e_breath, pv_p_breath, mean_pv_p_breath

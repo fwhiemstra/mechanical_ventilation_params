@@ -14,14 +14,14 @@ Date: February 2022
 from numpy import mean
 
 
-def tidal_volume_calculator(start_insp, end_insp, volume_trim):
+def tidal_volume_calculator(end_insp, volume_trim):
     """
     Returns the mean tidal volume of the segment
     """
     tidalerror = 0
     # Calculate tidal volume as volume difference between start and end inspiration
     tidal_volume = []
-    for start, end in zip(start_insp, end_insp):
+    for end in end_insp:
         try:
             volume_values = volume_trim[end] - 0
             tidal_volume.append(volume_values)

@@ -2,8 +2,7 @@ from import_and_process_data import convert_to_numpy_data
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-import pandas as pd
-from itertools import chain
+from constants import FS
 
 """This code detects coughs, filters the coughs and returns different cough parameters
 
@@ -11,48 +10,47 @@ Author: Jill Oudshoorn
 Date: July 2022 
 
 """
-def coughdetection(p_es, p_air, volume, flow):
-    
-    FSAMP = 100
-    p_es_signal, p_air_signal, volume_signal, flow_signal, time_signal = \
-        convert_to_numpy_data(p_es, p_air, volume, flow, FSAMP)
-   
-    print(len(p_es_signal))
-    print(len(p_es))
-    peakspositive, _ = find_peaks(p_es_signal, prominence=1)
-    peaksnegative, _ = find_peaks(-p_es_signal, prominence=1)
-  
-    peakstotal = np.append(peakspositive,peaksnegative)
-    peakssorted = sorted(peakstotal)
 
+def running_mean(x, N, mean_total):
+    x = np.pad(x, N//2, constant_values = mean_total)
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    mean = (cumsum[N:] - cumsum[:-N]) / float(N)
+    return mean
+
+def coughdetection(p_es, p_air, volume, flow,breath_no):
+    
+    #Determing constants based on data frequency
+    COUGH_REMOVE_SIZE = round(0.1*FS)
+    RUNNING_MEAN_SIZE = round(1*FS)
+
+    # Convert data for easier handling. Long input due to function requirements.
+    p_es_signal,p_air_signal,volume_signal,flow_signal, F_signal= convert_to_numpy_data(p_es,p_air,volume,flow,FS)
+    peakspositive, _ = find_peaks(p_es_signal, prominence=1)
     peakvalues_positive = p_es_signal[peakspositive]
-    def running_mean(x, N, mean_total):
-        x = np.pad(x, N//2, constant_values = mean_total)
-        cumsum = np.cumsum(np.insert(x, 0, 0))
-        mean = (cumsum[N:] - cumsum[:-N]) / float(N)
-        return mean
 
     # detect peaks above 1.4* the mean and take the area of one peak before and two peaks after
     mean_total = sum(peakvalues_positive)/len(peakvalues_positive)
-    mean_peaks = running_mean(peakvalues_positive, 100, mean_total)
+    mean_peaks = running_mean(peakvalues_positive, RUNNING_MEAN_SIZE, mean_total)
     artefact_peaks = []
     for i in range(1, len(peakspositive)-2):
         if p_es_signal[peakspositive[i]] > 1.4*mean_peaks[i]: 
             artefact_peaks.extend(list(range((peakspositive[i-1]), (peakspositive[i+2]))))
     artefact_peaks = list(set(artefact_peaks))
-    plt.plot(artefact_peaks,p_es_signal[artefact_peaks], "ob"); plt.plot(p_es_signal)
-    plt.show()
+    
+    # Plots to show the found artefact peaks
+    # plt.plot(artefact_peaks,p_es_signal[artefact_peaks], "ob"); plt.plot(p_es_signal)
+    # plt.show()
 
     # remove more than the detected cough in order to get better clean data. 
     artefact_peaks_remove = []
     for i in range(0, len(peakspositive)):
         if p_es_signal[peakspositive[i]] > 1.4*mean_peaks[i]: 
-            if i <= 10: 
-                artefact_peaks_remove.extend(list(range((peakspositive[0]), (peakspositive[i+10]))))
-            if len(artefact_peaks)-i <= 10:
-                artefact_peaks_remove.extend(list(range((peakspositive[i-10]), (peakspositive[-1]))))
+            if i <= COUGH_REMOVE_SIZE: 
+                artefact_peaks_remove.extend(list(range((peakspositive[0]), (peakspositive[i+COUGH_REMOVE_SIZE]))))
+            if len(artefact_peaks)-i <= COUGH_REMOVE_SIZE:
+                artefact_peaks_remove.extend(list(range((peakspositive[i-COUGH_REMOVE_SIZE]), (peakspositive[-1]))))
             else:
-                artefact_peaks_remove.extend(list(range((peakspositive[i-10]), (peakspositive[i+10]))))
+                artefact_peaks_remove.extend(list(range((peakspositive[i-COUGH_REMOVE_SIZE]), (peakspositive[i+COUGH_REMOVE_SIZE]))))
 
     artefact_peaks_remove = list(set(artefact_peaks_remove))
 
@@ -65,10 +63,10 @@ def coughdetection(p_es, p_air, volume, flow):
     for i in range(0, len(artefact_detection)):
         if artefact_detection[i] == 0:
             artefact_detection[i] = 'no cough'
-    print(len(artefact_detection))
+    
     """ Cough parameter calculations"""
     #time of coughing in seconds
-    cough_time_total = cough_time/FSAMP
+    cough_time_total = cough_time/FS
     cough_time_percentage = cough_time/len(artefact_detection)
     
     #create dictionary with all the coughs
@@ -87,7 +85,7 @@ def coughdetection(p_es, p_air, volume, flow):
         return group 
 
     group = dict(enumerate(grouper(artefact_peaks),1))
-   
+
     #number of coughs
     number_coughs = len(group)
     
@@ -100,7 +98,7 @@ def coughdetection(p_es, p_air, volume, flow):
             mean_power = sum(power)/len(power)
             cough_power.append(mean_power)
         mean_cough_power = sum(cough_power)/len(cough_power)
-   
+
         #mean amplitude of cough
         cough_amplitude = []
         for key in group:
@@ -114,12 +112,12 @@ def coughdetection(p_es, p_air, volume, flow):
         for key in group:
             length = len(group[key])
             cough_length.append(length)
-        mean_cough_length = (sum(cough_length)/len(cough_power))/FSAMP
+        mean_cough_length = (sum(cough_length)/len(cough_power))/FS
 
         temp = (list(group))
 
         #time in between coughs in seconds
-        mean_cough_inbetweentime = (len(p_es_signal)-cough_time)/number_coughs/FSAMP
+        mean_cough_inbetweentime = (len(p_es_signal)-cough_time)/number_coughs/FS
 
         #Percentage coughs >60L/min
         Number_hard_coughs = 0
@@ -150,18 +148,20 @@ def coughdetection(p_es, p_air, volume, flow):
         p_air_clean = p_air[cleandata1]
         flow_clean = flow[cleandata1]
         volume_clean = volume[cleandata1]
+        breath_no_clean = breath_no[cleandata1]
 
         length = len(p_es_clean)
-        time_sec = [i / FSAMP for i in range(0, length)]
+        time_sec = [i / FS for i in range(0, length)]
     
-        fig, axs = plt.subplots(2, sharey=True)
-        axs[0].plot(artefact_peaks_remove,p_es_signal[artefact_peaks_remove], "ob"); axs[0].plot(p_es_signal)
-        axs[1].plot(time_sec,p_es_clean)
-        plt.show()
+        #_, axs = plt.subplots(2, sharey=True)
+        
+        # Plot with clean data
+        #axs[0].plot(artefact_peaks_remove,p_es_signal[artefact_peaks_remove], "ob"); axs[0].plot(p_es_signal)
+        #axs[1].plot(time_sec,p_es_clean)
+        #plt.show()
 
-        return p_es_clean,p_air_clean,flow_clean,volume_clean, artefact_detection,cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs
-
-    else:
+        return p_es_clean,p_air_clean,flow_clean,volume_clean, breath_no_clean, artefact_detection,cough_time_total, cough_time_percentage, number_coughs, mean_cough_power, mean_cough_amplitude, mean_cough_length, mean_cough_inbetweentime, mean_cough_peak_flow, max_cough_peak_flow, percentage_hard_coughs    
+    else:   
         artefact_detection =0
         cough_time_total =0
         cough_time_percentage =0

@@ -8,6 +8,8 @@ Date: February 2022
 
 import numpy as np
 from constants import FS
+import pandas as pd
+
 
 def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
     """
@@ -15,13 +17,20 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
     """
 
     # Variables
-    separation = round(0.3 * (1/rr_) * 60 * FS)
-    dist = 40
-    close_dist = 30
-    amplitude = 100
-    end_insp_sep = 50
-    inspirationerror = 0
+    # separation = round(0.3 * (1/rr_) * 60 * FS)
+    # dist = 40
+    # close_dist = 30
+    # amplitude = 100
+    # end_insp_sep = 50
+    # inspirationerror = 0
 
+    # Variables depending on sampling frequency
+    separation = round(0.3 * (1/rr_) * 60 * FS)
+    dist = round(0.4*FS)
+    close_dist = 0.3*FS
+    amplitude = 100
+    end_insp_sep = round(0.5*FS)
+    inspirationerror = 0
 
     """ Find where flow == 0 """
     # Since the flow data never becomes exactly zero. Find the transition:
@@ -40,7 +49,6 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
             i += 1
         else:
             i += 1
-       
 
     """ Find all estimated start and end points with a minimal separation """
     # Estimated start point
@@ -50,7 +58,7 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
             i += 1
         else:
             del start_insp_flow[i]
-      
+
     # Estimated end point
     i = 1
     while i < len(end_insp_flow):
@@ -58,7 +66,6 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
             i += 1
         else:
             del end_insp_flow[i]
-      
 
     # Exclude starts or ends without corresponding starts or ends
     i = -5
@@ -67,25 +74,26 @@ def inspiration_detection(volume_trim, p_es_trim, flow_trim, rr_):
             i += 1
         else:
             del end_insp_flow[i]
-        
 
-   
     if start_insp_flow[0] > end_insp_flow[0]:
         del end_insp_flow[0]
-  
+
     if start_insp_flow[-1] > end_insp_flow[-1]:
         del start_insp_flow[-1]
-   
+
     # Make sure start inspiration and end inspiration alternate
     while len(start_insp_flow) != len(end_insp_flow):
         if len(start_insp_flow) > len(end_insp_flow):
+            # print(len(end_insp_flow))
+            # print(len(start_insp_flow))
             i = 1
             while i < len(end_insp_flow):
                 if start_insp_flow[i] < end_insp_flow[i] and start_insp_flow[i] > end_insp_flow[i-1]:
                     i += 1
                 else:
                     del start_insp_flow[i]
-                    
+
+
         if len(end_insp_flow) > len(start_insp_flow):
             i = 0
             while i < len(start_insp_flow):

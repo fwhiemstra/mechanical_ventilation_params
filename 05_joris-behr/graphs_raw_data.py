@@ -6,8 +6,10 @@ Date: February 2022
 
 """
 import matplotlib.pyplot as plt
-import csv
 import math
+
+from import_and_process_data import import_data
+from constants import FS
 
 def graphs_raw_data(p_es, p_air, volume, flow, fs_):
     """
@@ -29,7 +31,6 @@ def graphs_raw_data(p_es, p_air, volume, flow, fs_):
     
 
     fig = plt.figure()
-
     ax1 = plt.subplot2grid((2, 2), (0, 0))
     ax2 = plt.subplot2grid((2, 2), (1, 0), sharex=ax1)
     ax3 = plt.subplot2grid((2, 2), (0, 1), sharex=ax1)
@@ -56,7 +57,11 @@ def graphs_raw_data(p_es, p_air, volume, flow, fs_):
     ax4.set_ylabel(r'Flow [mL/s]')
     ax4.set_xlabel(r'Time [s]')
 
-
     plt.tight_layout()
     plt.show()
 
+if __name__ == '__main__':
+    # If run seperately from main, visualise data
+    input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\2\Waves_002.txt'
+    [p_air, p_es, flow, volume, breath_no] = import_data(input_file)
+    graphs_raw_data(p_es, p_air, volume, flow, FS)
