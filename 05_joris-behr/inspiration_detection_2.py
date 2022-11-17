@@ -91,10 +91,10 @@ def inspiration_detection_2(flow,rr):
     start_insp = np.append(start_insp,idx_peak[-1])
 
     # Finding end inspiration by using flow acceleration:
-    # 1. Determining highest negative peak between two inspirations
+    # 1. Determining first negative flow acceleration peak between two inspirations with value <100mL/s^2
     # 2. Finding nearest point where flow switches neg-pos(2a) or pos-neg(2b)
     # 3. Set end inspiration at last positive value before switch
-    # 4. Remove start insp values that can't meet requirement of step 2.x
+    # 4. Remove start insp values that can't meet requirement of step 2
     end_insp = list()
     end_insp_peak = list()
     val_start_remove = list()
@@ -117,6 +117,7 @@ def inspiration_detection_2(flow,rr):
             # Step 2b
             elif flow[exp_peak_loc] >0:
                 new_peak = np.where((flow[exp_peak_loc:exp_peak_loc+10])<=0)[0]
+                # Step 3
                 if len(new_peak) >0:
                     end_insp.append(exp_peak_loc+new_peak[0]-1)
                 else:
@@ -135,10 +136,10 @@ def inspiration_detection_2(flow,rr):
     end_insp_time = [i / FS for i in end_insp]
     time_sec = [i / FS for i in range(0, len(flow))] # Time in seconds for plot
     
-    # # figures
+    # figures
     # fig = plt.figure()
     # ax1 = fig.add_subplot(2,1,1)
-    # ax1.plot(time_sec, flow, 'k')
+    # ax1.plot(time_sec, flow)
     # start_insp_scat = ax1.scatter(start_insp_time, flow[start_insp], c='g')
     # end_insp_scat  = ax1.scatter(end_insp_time,flow[end_insp], c='y')
     # ax1.legend((start_insp_scat,end_insp_scat,),
@@ -152,11 +153,14 @@ def inspiration_detection_2(flow,rr):
 
     # ax1.set_title(r'Flow')
     # ax2.set_title(r'Flow acceleration')
+
     # ax1.set_ylabel(r'Pressure [cmH2O]')
-    # ax1.set_xlabel(r'Time [s]')
+    # ax2.set_ylabel(r'Pressure [cmH2O]')
+    # ax2.set_xlabel(r'Time [s]')
     # plt.tight_layout()
     # plt.show()
 
+    # Removing last value, since no end-inspiration is coupled
     start_insp = start_insp[0:-1]
 
     #defining start and end values

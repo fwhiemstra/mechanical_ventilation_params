@@ -12,6 +12,7 @@ Date: February 2022
 """
 import matplotlib.pyplot as plt
 from constants import FS, PRESSURE_TYPE
+import numpy as np
 
 
 def graphs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, start_insp,end_insp_values,start_insp_values,
@@ -74,11 +75,47 @@ def graphs(p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp, s
         end_vol_values.append(end_values)
     end_insp_vol = ax1.scatter(end_insp_time, end_vol_values, c='r')
 
+
     start_p_es = []
     for i in start_insp:
         start_values = p_es_trim[i]
         start_p_es.append(start_values)
     start_insp_pes = ax4.scatter(start_insp_time, start_p_es, c='g')
+
+
+
+    start_vol = []
+    start_aw = []
+    start_es = []
+    start_tp = []
+    for i in start_insp:
+        start_vol.append(volume_trim[i])
+        start_aw.append(p_air_trim[i])
+        start_es.append(p_es_trim[i])
+        start_tp.append(p_tp_trim[i])
+
+    end_vol = []
+    end_aw = []
+    end_es = []
+    end_tp = []
+    for i in end_insp:
+        end_vol.append(volume_trim[i])
+        end_aw.append(p_air_trim[i])
+        end_es.append(p_es_trim[i])
+        end_tp.append(p_tp_trim[i])
+
+
+
+    # OPTIONAL: adding inspiration to all graphs
+    # ax1.scatter(start_insp_time,start_vol,c='g')
+    # ax3.scatter(start_insp_time,start_aw,c='g')
+    # ax4.scatter(start_insp_time,start_es,c='g')
+    # ax5.scatter(start_insp_time,start_tp,c='g')
+
+    # ax3.scatter(end_insp_time,end_aw, c='r')
+    # ax4.scatter(end_insp_time,end_es, c='r')
+    # ax5.scatter(end_insp_time, end_tp, c='r')
+
 
     plt.tight_layout()
     plt.show()

@@ -17,6 +17,7 @@ from turtle import shape
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib
 import matplotlib.pyplot as plt
 
 from constants import PRESSURE_TYPE
@@ -141,20 +142,23 @@ def correlations_xlsx(input):
     
     if type(input) == str:
         # Selecting columns that contain data
-        data = pd.read_excel(input, usecols='B:N')
+        data = pd.read_excel(input, usecols='B:Q')
     else:
         data = input
     # Filtering data based on measuring location
-    data_aw = data[["e_aw", "pow_aw", "hys_aw"]]
-    data_es = data[["e_es", "pow_es", "hys_es", "ptp_es"]]
-    data_tp= data[["e_tp", "pow_tp", "hys_tp", "ptp_tp", "tp_peak", "tp_swing"]]
+    # data_tot = data[["pow_aw","e_hys_aw", "hys_aw","pow_es","e_hys_es" ,"hys_es", "ptp_es","pow_tp", "e_hys_tp", "hys_tp", "ptp_tp", "tp_swing"]]
+    data_tot = data[["pow_aw", "hys_aw","pow_es" ,"hys_es", "ptp_es","pow_tp", "hys_tp", "ptp_tp", "tp_swing"]]
+    data_aw = data[["pow_aw","e_hys_aw", "hys_aw"]]
+    data_es = data[["pow_es","e_hys_es" ,"hys_es", "ptp_es"]]
+    # data_tp= data[["pow_tp", "e_hys_tp", "hys_tp", "ptp_tp", "tp_swing"]]
+    data_tp= data[["pow_tp", "hys_tp", "ptp_tp", "tp_swing"]]
     
     ## Uncomment data below to create own filtered data
     # data_fil = data[["heading1", "heading2", "heading3"]]
     
     
     ## Creating correlation matrices, spearman is used since data is not normally distributed
-    matrix_tot = data.corr(method = 'spearman').round(2)
+    matrix_tot = data_tot.corr(method = 'spearman').round(2)
     mask_tot = np.triu(np.ones_like(matrix_tot, dtype=bool))
     
     matrix_aw = data_aw.corr(method = 'spearman').round(2)
@@ -171,61 +175,63 @@ def correlations_xlsx(input):
     # mask_fil = np.triu(np.ones_like(matrix_fil, dtype=bool)) 
     
     ## Filter values based on correlation value
-    # matrix_tot_fil = matrix_tot.unstack()
-    # matrix_tot_fil = matrix_tot_fil[abs(matrix_tot_fil) >= 0.7]
-    # print(matrix_tot_fil)   
+    matrix_tot_fil = matrix_tot.unstack()
+    matrix_tot_fil = matrix_tot_fil[abs(matrix_tot_fil) >= 0.7]
+    print(matrix_tot_fil)   
 
+    # font = {'size'   : 16}
 
+    # matplotlib.rc('font', **font)
     ## Creating figures
     # pairplots
     pp_aw = sns.pairplot(data_aw)
-    pp_aw.fig.suptitle("Scatterplot matrix of airway parameters")
+    # pp_aw.fig.suptitle("Scatterplot matrix of airway parameters")
     plt.tight_layout()
-    plt.savefig('pairplot_aw.jpg')
+    # plt.savefig('pairplot_aw.jpg')
 
 
     pp_es = sns.pairplot(data_es)
-    pp_es.fig.suptitle("Scatterplot matrix of esophageal parameters")
+    # pp_es.fig.suptitle("Scatterplot matrix of esophageal parameters")
     plt.tight_layout()
-    plt.savefig('pairplot_es.jpg')
+    # plt.savefig('pairplot_es.jpg')
 
     pp_tp = sns.pairplot(data_tp)
-    pp_tp.fig.suptitle("Scatterplot matrix of transpulmonal parameters")
+    # pp_tp.fig.suptitle("Scatterplot matrix of transpulmonal parameters")
     plt.tight_layout()
-    plt.savefig('pairplot_tp.jpg')
+    plt.savefig('pairplot_tp_hys.jpg')
 
     ## Uncomment lines below to plot own filtered data
     # pp_fil = sns.pairplot(data_fil)
     # pp_fil.fig.suptitle("Scatterplot matrix of filtered parameters")
     # plt.tight_layout()
 
-    plt.show()
+    # plt.show()
 
     # Correlation heatmaps
     # To show only half of the heat map, add mask = mask_{name of data}. ie for total: mask=mask_tot
     plt.figure()
     sns.heatmap(matrix_tot,annot = True, vmax = 1, vmin = -1, center = 0, cmap = 'vlag')
-    plt.title("Heat map of correlations")
+    # plt.title("Heat map of correlations")
     plt.tight_layout()
-    plt.savefig('heatmap_tot.jpg')
+    plt.savefig('heatmap_tot_hys.jpg')
 
     plt.figure()
     sns.heatmap(matrix_aw,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
-    plt.title("Heat map of airway parameter correlations")
+    # plt.title("Heat map of airway parameter correlations")
     plt.tight_layout()
-    plt.savefig('heatmap_aw.jpg')
+    # plt.savefig('heatmap_aw.jpg')
 
     plt.figure()
     sns.heatmap(matrix_es,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
-    plt.title("Heat map of esophageal parameter correlations")
+    # plt.title("Heat map of esophageal parameter correlations")
     plt.tight_layout()
-    plt.savefig('heatmap_es.jpg')
+    # plt.savefig('heatmap_es.jpg')
 
     plt.figure()
     sns.heatmap(matrix_tp,annot = True, vmax = 1, vmin = 0, center = 0.5, cmap = 'vlag')
-    plt.title("Heat map of transpulmonal parameter correlations")
+    # plt.title("Heat map of transpulmonal parameter correlations")
     plt.tight_layout()
-    plt.savefig('heatmap_tp.jpg')
+    plt.savefig('heatmap_tp_hys.jpg')
 
     ## Uncomment code below to create own filtered heatmap
     # plt.figure()
@@ -233,9 +239,22 @@ def correlations_xlsx(input):
     # plt.title("Heat map of transpulmonal parameter correlations")
     # plt.tight_layout()
 
-    plt.show()
+    # plt.show()
+    return data
 
+def bland_altman_plot(data1, data2, *args, **kwargs):
+    data1     = np.asarray(data1)
+    data2     = np.asarray(data2)
+    mean      = np.mean([data1, data2], axis=0)
+    diff      = data1 - data2                   # Difference between data1 and data2
+    md        = np.mean(diff)                   # Mean of the difference
+    sd        = np.std(diff, axis=0)            # Standard deviation of the difference
 
+    plt.figure()
+    plt.scatter(data1, diff, *args, **kwargs)
+    plt.axhline(md,           color='gray', linestyle='--')
+    plt.axhline(md + 1.96*sd, color='gray', linestyle='--')
+    plt.axhline(md - 1.96*sd, color='gray', linestyle='--')
 
 
 
@@ -243,4 +262,18 @@ if __name__ == '__main__':
     """Run excel code seperately from main.py by running "python statistics_calculator.py" 
     Make sure to select correct input data directory for the data"""
     input = r"C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\params\param_tot.xlsx"
-    correlations_xlsx(input)
+    data = correlations_xlsx(input)
+    bland_altman_plot(data['pow_tp'],data['tp_swing'])
+    plt.title('Bland altman plot tp-swing vs tp-power')
+    plt.xlabel("Transpulmonal power")
+    plt.ylabel("Difference between 2 measures")
+
+    bland_altman_plot(data['tp_swing'],data['pow_tp'])
+    plt.title('Bland altman plot tp-swing vs tp-power')
+    plt.xlabel("Transpulmonal swing")
+    plt.ylabel("Difference between 2 measures")
+    bland_altman_plot(data['pow_tp']/max(data['pow_tp']), data['tp_swing']/max(data['tp_swing']))
+    plt.title('Bland altman plot normalized tp-swing vs tp-power')
+    plt.xlabel("Average of 2 measures")
+    plt.ylabel("Difference between 2 measures")
+    plt.show()

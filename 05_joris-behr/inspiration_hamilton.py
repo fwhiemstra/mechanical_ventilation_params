@@ -44,8 +44,8 @@ def breaths_hamilton(flow,breath_no,rr):
     start_insp = np.where(np.diff(breath_no) > 0)
 
     # Improving inspiration by: 1) Shifting time of start and 2) too high/low values
-    start_insp_improved = np.asarray(start_insp).flatten()
-    start_insp_improved = start_insp_improved - ADJ_HAM
+    start_insp = np.asarray(start_insp).flatten()
+    start_insp_improved = start_insp - ADJ_HAM
     start_insp_improved = [i for i in start_insp_improved if flow[i]<250 and flow[i] > -250]
 
     # Remove values that are too close to eachother or arent followed by positive flow
@@ -109,6 +109,7 @@ def breaths_hamilton(flow,breath_no,rr):
 
     #computing time from start indices
     time_sec = [i / FS for i in range(0, len(flow))] # Time in seconds for plot
+    start_insp_time = [i / FS for i in start_insp]
     start_insp_time_improved = [i / FS for i in start_insp_improved]
     start_insp_time_improved_2= [i / FS for i in start_insp_improved_2]
     end_insp_time = [i / FS for i in end_insp_ham]
@@ -120,13 +121,13 @@ def breaths_hamilton(flow,breath_no,rr):
     # figures
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
-    ham_insp_impr = ax1.scatter(start_insp_time_improved, flow[start_insp_improved], c='g')
-    ham_insp_impr2 = ax1.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
-    ham_exp = ax1.scatter(end_insp_time,flow[end_insp_ham], marker="x", c='y')
-    ax1.legend((ham_insp_impr,ham_insp_impr2,ham_exp),
-            ('Hamilton inspiration + time shift', 'Hamilton inspiration improved', 'Hamilton expiration'), loc='upper right', shadow=True)
-    ax1.plot(time_sec, flow, 'b')
-    ax1.set_title(r'flow')
+    ham_insp_impr = ax1.scatter(start_insp_time, flow[start_insp], c='g')
+    # ham_insp_impr2 = ax1.scatter(start_insp_time_improved_2, flow[start_insp_improved_2], c='y')
+    # ham_exp = ax1.scatter(end_insp_time,flow[end_insp_ham], marker="x", c='y')
+    # ax1.legend((ham_insp_impr,ham_insp_impr2,ham_exp),
+    #         ('Hamilton inspiration + time shift', 'Hamilton inspiration improved', 'Hamilton expiration'), loc='upper right', shadow=True)
+    ax1.plot(time_sec, flow)
+    ax1.set_title(r'Hamilton inspiration detection on flow signal')
     ax1.set_ylabel(r'Pressure [cmH2O]')
     ax1.set_xlabel(r'Time [s]')
     plt.tight_layout()

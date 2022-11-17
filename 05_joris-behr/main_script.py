@@ -32,7 +32,7 @@ import os
 import sys
 import pandas as pd
 
-from hamilton_vs_script import ham_vs_script
+
 my_dir = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\mechanical_ventilation_params\05_joris-behr'
 #my_dir = r'C:\Users\jiddl\Desktop\stage 4\python codes\code-Jill-Oudshoorn'
 os.chdir(my_dir)
@@ -55,7 +55,7 @@ from ptp_calculator import ptp_calculator
 from tp_parameter_calculator import tp_parameter_calculator
 from energy_calculator import energy_calculator
 from pv_energy_calculator import pv_energy_calculator
-from statistics_calculator import sd_se_statistics, correlations
+from statistics_calculator import sd_se_statistics, correlations, correlations_xlsx
 from graphs import graphs
 from graphs_ham_vs_script import graphs_vs
 from summary import summary
@@ -70,6 +70,7 @@ from inspiration_hamilton import breaths_hamilton
 from inspiration_detection_2 import inspiration_detection_2
 from export_params import export_params, param_to_df
 from pes_pcw_correction import pes_pcw_correction
+from compare_scripts import ham_vs_script
 
 #%%
 "choises of skipping parts of the script"
@@ -87,14 +88,14 @@ from pes_pcw_correction import pes_pcw_correction
 # Settings
 artefactdetection = 1
 exportCSV = 0
-graph = 0
+graph = 1   
 annotation = 0
 params = ['234', 2, 'test']
 insp_detection = 'script2'
 insp_comp = ''
-input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\9\Waves_009.txt'
+input_file = r'C:\Users\joris\OneDrive\Documenten\Studie\TM jaar 2&3\Q1\data\wave_mode\1\Waves_001.txt'
 output_xlsx_file = []
-#
+
 
 """ Annotate, Import and name data """
 if annotation == 1:
@@ -117,8 +118,6 @@ patient_id = params[0]
 if exportCSV ==1:
     export_csv(p_es, p_air, volume, flow, FS, length, patient_id, t_dur)
 
-p_es,pcw = pes_pcw_correction(p_es)
-print(pcw)
 
 """Artefact detection"""
 # detects coughs, filters the coughs and returns a list with cough parameters
@@ -284,7 +283,7 @@ elif pressure_type == PRESSURE_TYPE.AIRWAY:
 """ Display of the results """
 # Compare inspiration detection resulsts
 if insp_comp != "":
-    ham_vs_script(start_insp,start_insp_2,flow_trim,insp_detection,insp_comp)
+    ham_vs_script(start_insp,start_insp_2,end_insp,end_insp_2,flow_trim,insp_detection,insp_comp)
     if graph == 1:
         graphs_vs( 
         p_air_trim, p_es_trim, p_tp_trim, volume_trim, flow_trim, end_insp,end_insp_2, start_insp,start_insp_2,
@@ -302,11 +301,10 @@ if graph == 1:
 #     ptp_tp_mean, tp_peak_mean, tp_swing_mean)
 
 
-# transform parameters to one single dataframe
+# transform parameters to one single dataframe and export
 param = param_to_df(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp,e_hys_aw, e_hys_es, e_hys_tp, hys_aw, hys_es, hys_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
+# param.to_excel("param011.xlsx")
 
-# Create excel file from parameter values
-# export_params(e_aw, e_es, e_tp, pow_aw, pow_es, pow_tp,e_hys_aw, e_hys_es, e_hys_tp, hys_aw, hys_es, hys_tp, ptp_es, ptp_tp, tp_peak, tp_swing)
 
 # Export results to output file
 output_option = params[1]  # 1 = use existing output file, 2 = create new output file

@@ -9,6 +9,7 @@ Date: February 2022
 """
 
 import numpy as np
+from numpy import NaN
 from constants import FS
 
 
@@ -43,7 +44,6 @@ def ptp_calculator(name, pressure, start_insp, end_insp):
                 ptp.append(ptp_single_breath)
         except:
             ptperror += 1
-            ptp_minute.append(NaN)
 
     # Calculate PTP/min per breath [cmH20.s/min]
     ptp_minute = []

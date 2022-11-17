@@ -13,7 +13,8 @@ from intersect import intersection
 import statistics as st
 
 
-def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
+
+def pv_energy_calculator(start, end, pressure, volume, plot_name,ax):
     """
     Returns pv_e_breath, mean_pv_e_breath, pv_p_breath, mean_pv_p_breath
     """
@@ -55,7 +56,8 @@ def pv_energy_calculator(start, end, pressure, volume, plot_name, ax):
                     vol_exp = vol_exp_org[0:ind_exp]
                     pres_exp = pres_exp_org[0:ind_exp]
 
-                # Plot the PV loops:
+                # # Plot the PV loops:
+                # """NOTE comment when using main_loop.py"""
                 ax.plot(pres_insp, vol_insp, color = 'lawngreen')
                 ax.plot(pres_exp, vol_exp, color = 'orange')
                 ax.set_title(plot_name)

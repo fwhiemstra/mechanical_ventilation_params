@@ -9,7 +9,7 @@ import numpy as np
 import statistics as st
 
 
-def ham_vs_script(start_insp,start_insp_2,flow,insp_detection,insp_comp):
+def ham_vs_script(start_insp,start_insp_2,end_insp, end_insp_2,flow,insp_detection,insp_comp):
     try:
         if len(start_insp_2) > len(start_insp):
             start_insp_2 = np.delete(start_insp_2, -1)
@@ -28,9 +28,12 @@ def ham_vs_script(start_insp,start_insp_2,flow,insp_detection,insp_comp):
     flow = np.array(flow)
 
     #Determining start flow values 
-    flow_insp_script = flow[start_insp]
+    flow_insp_1 = flow[start_insp]
     flow_insp_2 = flow[start_insp_2]
+    flow_exp_1 = flow[end_insp]
+    flow_exp_2 = flow[end_insp_2]
+
 
     #Calculating and printing mean and stdev
-    print(f'{insp_detection} no of insp = {len(start_insp)}  mean inspiratory start flow is {st.mean(flow_insp_script)} and std is {st.stdev(flow_insp_script)}')
-    print(f'{insp_comp} no of insp {len(start_insp_2)} = mean inpiratory start flow is {st.mean(flow_insp_2)} and std is {st.stdev(flow_insp_2)}')
+    print(f'{insp_detection} no of insp = {len(start_insp)}  mean inspiratory start flow is {st.mean(flow_insp_1)} +/- {st.stdev(flow_insp_1)}, mean expiratory start flow is {st.mean(flow_exp_1)} +/- {st.stdev(flow_exp_1)}')
+    print(f'{insp_comp} no of insp {len(start_insp_2)}, mean inpiratory start flow is {st.mean(flow_insp_2)} +/- {st.stdev(flow_insp_2)},mean expiratory start flow is {st.mean(flow_exp_2)} +/- {st.stdev(flow_exp_2)}')
