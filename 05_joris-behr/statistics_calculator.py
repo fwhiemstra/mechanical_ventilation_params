@@ -139,11 +139,12 @@ def correlations_xlsx(input):
     """Function to analyze data from excel file
     Shows histrogram, bar plots and correlation heatmaps"""
     
-    # Selecting columns that contain data
-    data = pd.read_excel(input, usecols='B:N')
-    
+    if type(input) == str:
+        # Selecting columns that contain data
+        data = pd.read_excel(input, usecols='B:N')
+    else:
+        data = input
     # Filtering data based on measuring location
-    
     data_aw = data[["e_aw", "pow_aw", "hys_aw"]]
     data_es = data[["e_es", "pow_es", "hys_es", "ptp_es"]]
     data_tp= data[["e_tp", "pow_tp", "hys_tp", "ptp_tp", "tp_peak", "tp_swing"]]
